@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import {CoreChart, Axis} from '../../src';
+  import {CoreChart, Axis, YAxis} from '../../src';
   import {viewPortLength} from '../../src/util';
   import Hammer from 'hammerjs';
 
@@ -44,17 +44,6 @@
 
         ctx.fillRect(pt.x - width/2, pt.y, width, height);
       }
-    }
-  }
-
-  class YAxis extends Axis{
-    d2c(axisValue){
-      let value = super.d2c(axisValue);
-      return viewPortLength(this.canvasViewPort) - value;
-    }
-    c2d(canvasValue){
-      let value = viewPortLength(this.canvasViewPort) - canvasValue;
-      return super.c2d(value);
     }
   }
 

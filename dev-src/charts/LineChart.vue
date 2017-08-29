@@ -5,16 +5,16 @@
 </template>
 
 <script>
-  import {CoreChart, Axis} from '../../src';
+  import {CoreChart, Axis, YAxis} from '../../src';
   import {viewPortLength} from '../../src/util';
   import Hammer from 'hammerjs';
 
-  class MyChart extends CoreChart{
-    render(){
+  class MyChart extends CoreChart {
+    render() {
       super.render();
       const ctx = this.ctx;
 
-      ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
+      ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       ctx.save();
       let cvx = this.getAxise('x').getCanvasViewPort();
@@ -31,19 +31,19 @@
       ctx.restore();
     }
 
-    renderLine(ctx, cvx, cvy){
-      if(this.data.length){
+    renderLine(ctx, cvx, cvy) {
+      if (this.data.length) {
         let start = this.d2c(this.data[0]);
 
         ctx.beginPath();
         ctx.lineTo(start.x, start.y);
-        for(let pt of this.data){
+        for (let pt of this.data) {
           pt = this.d2c(pt);
           ctx.lineTo(pt.x, pt.y);
         }
         ctx.stroke();
 
-        let end = this.d2c(this.data[this.data.length-1]);
+        let end = this.d2c(this.data[this.data.length - 1]);
         ctx.lineTo(end.x, cvy.max);
         ctx.lineTo(start.x, cvy.max);
 
@@ -56,11 +56,11 @@
       }
     }
 
-    renderMaker(ctx, cvx, cvy){
+    renderMaker(ctx, cvx, cvy) {
 
       ctx.strokeStyle = '#f00';
       ctx.fillStyle = "#600";
-      for(let pt of this.data){
+      for (let pt of this.data) {
         pt = this.d2c(pt);
         ctx.beginPath();
         ctx.lineTo(pt.x, pt.y);
@@ -73,18 +73,6 @@
       }
     }
   }
-
-  class YAxis extends Axis{
-    d2c(axisValue){
-      let value = super.d2c(axisValue);
-      return viewPortLength(this.canvasViewPort) - value;
-    }
-    c2d(canvasValue){
-      let value = viewPortLength(this.canvasViewPort) - canvasValue;
-      return super.c2d(value);
-    }
-  }
-
 
   function updateSize(){
     const canvas = this.$refs.canvas;

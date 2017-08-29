@@ -1,6 +1,6 @@
 import {viewPortMove, viewPortLength, viewPortZoom} from "./util";
 
-export default class Axis{
+export class Axis{
   constructor(name){
     this.name = name;
     this.viewPort = {
@@ -110,3 +110,15 @@ export default class Axis{
     this.viewPort = vp;
   }
 }
+
+export class YAxis extends Axis{
+  d2c(axisValue){
+    let value = super.d2c(axisValue);
+    return viewPortLength(this.canvasViewPort) - value;
+  }
+  c2d(canvasValue){
+    let value = viewPortLength(this.canvasViewPort) - canvasValue;
+    return super.c2d(value);
+  }
+}
+export default Axis;

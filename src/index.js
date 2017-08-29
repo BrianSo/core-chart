@@ -1,8 +1,9 @@
 import CoreChart from './CoreChart';
-import Axis from './Axis';
+import {Axis, YAxis} from './Axis';
 
 export default CoreChart;
 export {
   CoreChart,
-  Axis
+  Axis,
+  YAxis
 };
