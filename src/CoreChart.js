@@ -69,10 +69,5 @@ export default class CoreChart{
   }
   render(){
     this.renderId = -1;
-
-    const ctx = this.ctx;
-    ctx.fillRect(0,0,this.canvas.width, this.canvas.height);
-    ctx.fillStyle = '#f00';
-    ctx.fillRect(10,10,10,10);
   }
 }

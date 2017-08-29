@@ -39,7 +39,9 @@ export default class Axis{
   c2d(canvasValue){
     if(this.shouldUpdateViewPort)
       this.settleViewPort();
-    return canvasValue;
+
+    const offset = (canvasValue - this.canvasViewPort.min) / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort);
+    return offset + this.viewPort.min;
   }
 
   scroll(diff){
@@ -63,7 +65,7 @@ export default class Axis{
     return this;
   }
 
-  getVuewOirtLimit(){
+  getViewPortLimit(){
     return this.viewPortLimit;
   }
   setViewPortLimit({min, max}){
@@ -77,5 +79,18 @@ export default class Axis{
   }
   settleViewPort(){
     this.shouldUpdateViewPort = false;
+
+    let vp = this.viewPort;
+    const vpLimit = this.viewPortLimit;
+
+    if(viewPortLength(vp) >= viewPortLength(vpLimit)){
+      vp = {...vpLimit};
+    } else if(vp.max > vpLimit.max){
+      vp = viewPortMove(vp, vpLimit.max - vp.max);
+    }else if(vp.min < vpLimit.min){
+      vp = viewPortMove(vp, vpLimit.min - vp.min);
+    }
+
+    this.viewPort = vp;
   }
 }

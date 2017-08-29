@@ -68,7 +68,7 @@
 
       this.chart.setData([{
         x: 5,
-        y: 0
+        y: 5
       }]);
       xAxis.setViewPort({
         min: 0, max: 10
