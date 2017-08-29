@@ -5,13 +5,18 @@
 </template>
 
 <script>
+  import Tween from '@tweenjs/tween.js';
   import PinchPanManager from '../../src/plugins/PinchPan';
   import {CoreChart, Axis, YAxis, util} from '../../src';
   const {viewPortLength} = util;
 
   class MyChart extends CoreChart {
-    render() {
-      super.render();
+    beforeRender(time, deltaTime){
+      super.beforeRender(time, deltaTime);
+      Tween.update();
+    }
+    render(time, deltaTime) {
+      super.render(time, deltaTime);
       const ctx = this.ctx;
 
       ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -108,7 +113,7 @@
       ctx.fillStyle = "#600";
       for (let pt of this.data) {
         pt = this.d2c(pt);
-        ctx.fillRect(pt.x - 5, pt.y - 5, 10, 10);
+        ctx.fillRect(pt.x - 2, pt.y - 2, 4, 4);
       }
     }
   }
@@ -151,7 +156,8 @@
         x:0,
         y:5
       });
-      for(let i = 1; i < 1000; i++){
+      let i = 1;
+      for(; i < 1000; i++){
         let y = data[i-1].y *  (0.8 + Math.random() * 0.41);
         if(y>max)max = y;
         data.push({
@@ -159,6 +165,17 @@
           y:y
         });
       }
+
+      setInterval(()=>{
+        data.shift();
+        let y = data[data.length - 1].y *  (0.8 + Math.random() * 0.41);
+        if(y>max)max = y;
+        data.push({
+          x:i++,
+          y:y
+        });
+        this.chart.scroll({x:1}, true);
+      },1000);
 
       this.chart.setData(data);
       xAxis.setViewPort({

@@ -1,5 +1,4 @@
 import Hammer from 'hammerjs';
-import Tween from '@tweenjs/tween.js';
 
 export default class PinchPanManager{
   constructor(canvas, chart, options){
@@ -93,10 +92,6 @@ export default class PinchPanManager{
         chart.on('beforeRender', velocityUpdate);
         lastUpdateCb = velocityUpdate;
       }
-    });
-
-    chart.on('beforeRender',(time)=>{
-      Tween.update(time);
     });
   }
 }

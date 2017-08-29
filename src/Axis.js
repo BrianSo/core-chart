@@ -48,12 +48,15 @@ export class Axis{
     return offset + this.viewPort.min;
   }
 
-  scroll(diff){
+  scroll(diff, scrollLimit){
     this.viewPort = viewPortMove(this.viewPort, diff);
+    if(scrollLimit){
+      this.viewPortLimit = viewPortMove(this.viewPortLimit, diff);
+    }
     this.viewPortChanged();
   }
-  scrollInPx(diff){
-    this.scroll(diff / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort))
+  scrollInPx(diff, scrollLimit){
+    this.scroll(diff / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort), scrollLimit)
   }
 
   zoom(scale, center){

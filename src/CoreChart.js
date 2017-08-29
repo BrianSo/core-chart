@@ -17,15 +17,15 @@ export default class CoreChart{
     this.renderInNextFrame();
   }
 
-  scroll(axisDiffs){
+  scroll(axisDiffs, scrollLimit){
     for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].scroll(axisDiffs[key]);
+      this.axises[key] && this.axises[key].scroll(axisDiffs[key], scrollLimit);
     }
     this.renderInNextFrame();
   }
-  scrollInPx(axisDiffs){
+  scrollInPx(axisDiffs, scrollLimit){
     for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].scrollInPx(axisDiffs[key]);
+      this.axises[key] && this.axises[key].scrollInPx(axisDiffs[key], scrollLimit);
     }
     this.renderInNextFrame();
   }
