@@ -35,14 +35,16 @@ export default class CoreChart{
   d2c(dataInAxisValue){
     const result = {};
     for(const key of Object.keys(dataInAxisValue)){
-      result[key] = this.axises[key].d2c(dataInAxisValue[key]);
+      if(this.axises[key])
+        result[key] = this.axises[key].d2c(dataInAxisValue[key]);
     }
     return result;
   }
   c2d(dataInCanvasValue){
     const result = {};
     for(const key of Object.keys(dataInCanvasValue)){
-      result[key] = this.axises[key].c2d(dataInCanvasValue[key]);
+      if(this.axises[key])
+        result[key] = this.axises[key].c2d(dataInCanvasValue[key]);
     }
     return result;
   }
