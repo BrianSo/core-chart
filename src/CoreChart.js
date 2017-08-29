@@ -27,9 +27,15 @@ export default class CoreChart{
     }
     this.renderInNextFrame();
   }
-  zoom(axisDiffs){
+  zoom(axisDiffs, center){
     for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].zoom(axisDiffs[key]);
+      this.axises[key] && this.axises[key].zoom(axisDiffs[key], center[key]);
+    }
+    this.renderInNextFrame();
+  }
+  zoomFromCanvasPx(axisDiffs, centerInCanvasPx){
+    for(const key of Object.keys(axisDiffs)){
+      this.axises[key] && this.axises[key].zoomFromCanvasPx(axisDiffs[key], centerInCanvasPx[key]);
     }
     this.renderInNextFrame();
   }

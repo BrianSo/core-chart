@@ -52,9 +52,18 @@ export default class Axis{
     this.scroll(diff / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort))
   }
 
-  zoom(scale){
-    this.viewPort = viewPortZoom(this.viewPort, scale);
+  zoom(scale, center){
+    if(typeof center === 'undefined'){
+      center = this.c2d((this.canvasViewPort.min + this.canvasViewPort.max) / 2);
+    }
+    this.viewPort = viewPortZoom(this.viewPort, scale, center);
     this.viewPortChanged();
+  }
+  zoomFromCanvasPx(scale, centerInCanvasPx){
+    if(typeof centerInCanvasPx === 'undefined'){
+      centerInCanvasPx = (this.canvasViewPort.min + this.canvasViewPort.max) / 2;
+    }
+    this.zoom(scale, this.c2d(centerInCanvasPx));
   }
 
   getViewPort(){

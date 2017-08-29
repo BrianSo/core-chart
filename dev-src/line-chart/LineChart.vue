@@ -77,7 +77,11 @@
   class YAxis extends Axis{
     d2c(axisValue){
       let value = super.d2c(axisValue);
-      return this.canvasViewPort.min + viewPortLength(this.canvasViewPort)- (value - this.canvasViewPort.min);
+      return viewPortLength(this.canvasViewPort) - value;
+    }
+    c2d(canvasValue){
+      let value = viewPortLength(this.canvasViewPort) - canvasValue;
+      return super.c2d(value);
     }
   }
 
@@ -164,9 +168,14 @@
               const thisDistanceY = ev.pointers[0].clientY - ev.pointers[1].clientY;
               const lastDistanceY = lastPointers[0].clientY - lastPointers[1].clientY;
 
-              this.chart.zoom({
-                x:Math.abs(lastDistanceX/thisDistanceX),
-                y:Math.abs(lastDistanceY/thisDistanceY)
+              const scaleX = Math.abs(thisDistanceX) < 100 ? 1 : Math.abs(lastDistanceX/thisDistanceX);
+              const scaleY = Math.abs(thisDistanceY) < 100 ? 1 : Math.abs(lastDistanceY/thisDistanceY);
+              this.chart.zoomFromCanvasPx({
+                x:scaleX,
+                y:scaleY
+              }, {
+                x:ev.center.x,
+                y:ev.center.y
               });
             }
             lastPointers = ev.pointers;
