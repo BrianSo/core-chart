@@ -5,9 +5,9 @@
 </template>
 
 <script>
-  import {CoreChart, Axis, YAxis} from '../../src';
-  import {viewPortLength} from '../../src/util';
-  import Hammer from 'hammerjs';
+  import PinchPanManager from './PinchPan';
+  import {CoreChart, Axis, YAxis, util} from '../../src';
+  const {viewPortLength} = util;
 
   class MyChart extends CoreChart {
     render() {
@@ -62,13 +62,6 @@
       ctx.fillStyle = "#600";
       for (let pt of this.data) {
         pt = this.d2c(pt);
-        ctx.beginPath();
-        ctx.lineTo(pt.x, pt.y);
-        ctx.lineTo(cvx.max - 10, pt.y);
-
-        ctx.stroke();
-        ctx.closePath();
-
         ctx.fillRect(pt.x - 5, pt.y - 5, 10, 10);
       }
     }
@@ -122,73 +115,14 @@
         min: 1, max: 12
       });
       yAxis.setViewPortLimit({
-        min: 0, max: 20
+        min: 0, max: 10
       });
 
       // Events
       this.resizeListener = onResize.bind(this);
       window.addEventListener('resize', this.resizeListener, false);
 
-      const mc = new Hammer.Manager(this.$refs.canvas);
-
-      const pinch = new Hammer.Pinch();
-      const pan = new Hammer.Pan();
-
-      pinch.recognizeWith(pan);
-
-      mc.add([pinch, pan]);
-
-      let lastEv;
-      let lastPointers;
-      mc.on("pinch pan", (ev) => {
-
-        ev.pointers = [...ev.pointers];
-        console.log(ev);
-
-        if(lastEv){
-
-
-          this.chart.scrollInPx({
-            x:-(ev.center.x - lastEv.center.x),
-            y:(ev.center.y - lastEv.center.y)
-          });
-
-          if(ev.pointers.length > 1){
-            //pinch
-            if(lastPointers){
-              const thisDistanceX = ev.pointers[0].clientX - ev.pointers[1].clientX;
-              const lastDistanceX = lastPointers[0].clientX - lastPointers[1].clientX;
-
-              const thisDistanceY = ev.pointers[0].clientY - ev.pointers[1].clientY;
-              const lastDistanceY = lastPointers[0].clientY - lastPointers[1].clientY;
-
-              const scaleX = Math.abs(thisDistanceX) < 100 ? 1 : Math.abs(lastDistanceX/thisDistanceX);
-              const scaleY = Math.abs(thisDistanceY) < 100 ? 1 : Math.abs(lastDistanceY/thisDistanceY);
-              this.chart.zoomFromCanvasPx({
-                x:scaleX,
-                y:scaleY
-              }, {
-                x:ev.center.x,
-                y:ev.center.y
-              });
-            }
-            lastPointers = ev.pointers;
-          }
-
-        }else{
-          this.chart.scrollInPx({
-            x:-ev.deltaX,
-            y:ev.deltaY
-          });
-        }
-
-
-        lastEv = ev;
-      });
-      mc.on("panend pinchend", (ev)=>{
-        lastEv = undefined;
-        lastPointers = undefined;
-      });
+      new PinchPanManager(this.$refs.canvas, this.chart);
     },
     beforeDestroy(){
       this.resizeListener && window.removeEventListener('resize', this.resizeListener);
