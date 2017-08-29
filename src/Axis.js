@@ -110,6 +110,23 @@ export class Axis{
     this.viewPort = vp;
   }
 
+  ticksMax(maxNumberOfTicks){
+
+    // desiredRange will be 2 ^ n
+    // viewPortLength(this.viewPort) / desiredRange <= maxNumberOfTicks
+
+    const width = viewPortLength(this.viewPort);
+
+    // width / 2 ^ n <= maxNumberOfTicks
+    // width / maxNumberOfTicks >= 2 ^ n
+    const rate = width/ maxNumberOfTicks;
+
+    // Log_2(rate) >= n
+    let n = Math.log2(rate);
+    n = Math.ceil(n);
+
+    return this.ticks(Math.pow(2, n));
+  }
   ticks(desiredRange){
     desiredRange = desiredRange || 1;
 

@@ -36,8 +36,8 @@
     renderTicks(ctx, cvx, cvy) {
       const xAxis = this.getAxise('x');
       const yAxis = this.getAxise('y');
-      const xTicks = xAxis.ticks(10);
-      const yTicks = yAxis.ticks();
+      const xTicks = xAxis.ticksMax(13);
+      const yTicks = yAxis.ticksMax(8);
 
       ctx.save();
 
