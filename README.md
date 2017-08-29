@@ -38,5 +38,4 @@ npm test
 ```
 
 ## TODO
-1. add build script
-2. write documentation
+1. write documentation

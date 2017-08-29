@@ -1,1 +1,4 @@
-export * from './PinchPan';
+import PinchPanManager from './PinchPan';
+export {
+  PinchPanManager
+};
