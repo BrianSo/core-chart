@@ -29,12 +29,16 @@ export default class Axis{
     return this;
   }
 
+  getScale(){
+    return viewPortLength(this.canvasViewPort) / viewPortLength(this.viewPort);
+  }
+
   d2c(axisValue){
     if(this.shouldUpdateViewPort)
       this.settleViewPort();
 
     const offset = axisValue - this.viewPort.min;
-    return this.canvasViewPort.min + offset * viewPortLength(this.canvasViewPort) / viewPortLength(this.viewPort);
+    return this.canvasViewPort.min + offset * this.getScale();
   }
   c2d(canvasValue){
     if(this.shouldUpdateViewPort)

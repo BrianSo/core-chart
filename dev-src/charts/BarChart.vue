@@ -1,7 +1,7 @@
 <template>
-    <div>
-      <canvas ref="canvas"></canvas>
-    </div>
+  <div>
+    <canvas ref="canvas"></canvas>
+  </div>
 </template>
 
 <script>
@@ -26,50 +26,23 @@
       ctx.clip();
       ctx.closePath();
 
-      this.renderLine(ctx, cvx, cvy);
-      this.renderMaker(ctx, cvx, cvy);
+      this.renderBar(ctx, cvx, cvy);
       ctx.restore();
     }
 
-    renderLine(ctx, cvx, cvy){
-      if(this.data.length){
-        let start = this.d2c(this.data[0]);
-
-        ctx.beginPath();
-        ctx.lineTo(start.x, start.y);
-        for(let pt of this.data){
-          pt = this.d2c(pt);
-          ctx.lineTo(pt.x, pt.y);
-        }
-        ctx.stroke();
-
-        let end = this.d2c(this.data[this.data.length-1]);
-        ctx.lineTo(end.x, cvy.max);
-        ctx.lineTo(start.x, cvy.max);
-
-        const gradient = ctx.createLinearGradient(0, cvy.min, 0, cvy.max);
-        gradient.addColorStop(0, 'rgba(250,174,50,1)');
-        gradient.addColorStop(1, 'rgba(250,174,50,0)');
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        ctx.closePath();
-      }
-    }
-
-    renderMaker(ctx, cvx, cvy){
+    renderBar(ctx, cvx, cvy){
 
       ctx.strokeStyle = '#f00';
       ctx.fillStyle = "#600";
+
+      const xScale = this.getAxise('x').getScale();
       for(let pt of this.data){
         pt = this.d2c(pt);
-        ctx.beginPath();
-        ctx.lineTo(pt.x, pt.y);
-        ctx.lineTo(cvx.max - 10, pt.y);
 
-        ctx.stroke();
-        ctx.closePath();
+        const width = 1 * xScale;
+        const height = cvy.max - pt.y;
 
-        ctx.fillRect(pt.x - 5, pt.y - 5, 10, 10);
+        ctx.fillRect(pt.x - width/2, pt.y, width, height);
       }
     }
   }
@@ -129,6 +102,12 @@
       });
       yAxis.setViewPort({
         min: 1, max: 9
+      });
+      xAxis.setViewPortLimit({
+        min: 1, max: 12
+      });
+      yAxis.setViewPortLimit({
+        min: 0, max: 20
       });
 
       // Events
@@ -204,11 +183,6 @@
     components: {}
   }
 </script>
-<style>
-  body{
-    margin: 0;
-  }
-</style>
 <style lang="scss" scoped>
   canvas{
     width: 100vw;
