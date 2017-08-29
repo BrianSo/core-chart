@@ -1,5 +1,7 @@
 # core-chart-js (alpha stage)
 
+[![Build Status](https://travis-ci.org/BrianSo/core-chart.svg?branch=master)](https://travis-ci.org/BrianSo/core-chart)
+
 This is a minimal library for creating highly customized chart. No rendering is included. Write the rendering by your self. Write the animation by your self.
 
 What it is included:  
