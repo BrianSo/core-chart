@@ -1,8 +1,27 @@
-# core-chart-js
+# core-chart-js (alpha stage)
 
-> core-chart-js
+This is a minimal library for creating highly customized chart. No rendering is included. Write the rendering by your self. Write the animation by your self.
 
-## Build Setup
+What it is included:  
+1. View port (zooming and scrolling)
+2. Conversion from data point to canvas position.
+
+Concepts:  
+1. Data space: the raw value of the data
+2. Canvas space: the projection result
+3. d2c, c2d: the conversion from data space to canvas space and vice versa.
+
+## APIs
+### CoreChart
+The chart controller.
+
+### Axis
+The axis of the chart. 
+
+### Examples
+see `dev-src/charts`
+
+## Contributing
 
 ``` bash
 # install dependencies
@@ -11,17 +30,13 @@ npm install
 # serve with hot reload at localhost:8080
 npm run dev
 
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
+# run unit tests while development
+npm run unit-dev
 
 # run all tests
 npm test
 ```
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## TODO
+1. add build script
+2. write documentation
