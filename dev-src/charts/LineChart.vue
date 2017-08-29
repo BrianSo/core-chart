@@ -5,16 +5,11 @@
 </template>
 
 <script>
-  import Tween from '@tweenjs/tween.js';
   import PinchPanManager from '../../src/plugins/PinchPan';
   import {CoreChart, Axis, YAxis, util} from '../../src';
   const {viewPortLength} = util;
 
   class MyChart extends CoreChart {
-    beforeRender(time, deltaTime){
-      super.beforeRender(time, deltaTime);
-      Tween.update();
-    }
     render(time, deltaTime) {
       super.render(time, deltaTime);
       const ctx = this.ctx;
@@ -33,7 +28,7 @@
 
       this.renderTicks(ctx, cvx, cvy);
       this.renderLine(ctx, cvx, cvy);
-      this.renderMaker(ctx, cvx, cvy);
+      //this.renderMaker(ctx, cvx, cvy);
       ctx.restore();
     }
 
@@ -174,7 +169,22 @@
           x:i++,
           y:y
         });
-        this.chart.scroll({x:1}, true);
+
+        let toScroll = 1;
+        let left = toScroll;
+
+        const scrollAnimation = (time, deltaTime)=>{
+          let nowScroll = toScroll * 0.1;
+          if(left < nowScroll){
+            nowScroll = left;
+            this.chart.off('beforeRender',scrollAnimation);
+          }
+          left -= nowScroll;
+          this.chart.scroll({x:nowScroll}, true);
+
+        };
+        this.chart.on('beforeRender',scrollAnimation);
+        this.chart.renderInNextFrame();
       },1000);
 
       this.chart.setData(data);
@@ -185,7 +195,7 @@
         min: 1, max: 9
       });
       xAxis.setViewPortLimit({
-        min: 1, max: 1000
+        min: 1, max: 999
       });
       yAxis.setViewPortLimit({
         min: 0, max: max
