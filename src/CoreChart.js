@@ -85,5 +85,8 @@ export default class CoreChart{
   }
   render(){
     this.renderId = -1;
+    this.getAllAxise().forEach(axis=>{
+      axis.settleViewPort();
+    });
   }
 }

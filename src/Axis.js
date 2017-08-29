@@ -109,6 +109,18 @@ export class Axis{
 
     this.viewPort = vp;
   }
+
+  ticks(desiredRange){
+    desiredRange = desiredRange || 1;
+
+    let ticksPos = [];
+    //find minimum tick
+    const minTick = this.viewPort.min - Math.abs(this.viewPort.min % desiredRange);
+    for(let t = minTick; t <= this.viewPort.max; t+= desiredRange){
+      ticksPos.push(t);
+    }
+    return ticksPos;
+  }
 }
 
 export class YAxis extends Axis{
