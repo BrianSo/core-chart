@@ -14,8 +14,8 @@ addons:
 before_script:
   - npm run unit
 
-#script:
-#  - npm run build
+script:
+  - npm run build
 
 cache:
   directories:

@@ -6,8 +6,8 @@
   "private": true,
   "main": "src/index.js",
   "scripts": {
-    "dev": "node build/dev-server.js",
-    "build": "node build/build.js",
+    "dev": "node dev-build/dev-server.js",
+    "build": "node build/build.js && node build/build.js --env build",
     "unit-dev": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js",
     "unit": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js --single-run",
     "test": "npm run unit"

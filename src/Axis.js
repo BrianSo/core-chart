@@ -103,7 +103,7 @@ export class Axis{
     const vpLimit = this.viewPortLimit;
 
     if(viewPortLength(vp) >= viewPortLength(vpLimit)){
-      vp = {...vpLimit};
+      vp = Object.assign({},vpLimit);
     } else if(vp.max > vpLimit.max){
       vp = viewPortMove(vp, vpLimit.max - vp.max);
     }else if(vp.min < vpLimit.min){
