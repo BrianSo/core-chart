@@ -8,28 +8,36 @@ export default class CoreChart{
     this.axises = {};
     this.data = [];
     this.renderId = -1;
-
-    this.renderInNextFrame();
   }
 
   setData(data){
     this.data = data;
+    this.renderInNextFrame();
   }
 
   scroll(axisDiffs){
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].scroll(axisDiffs[key]);
     }
+    this.renderInNextFrame();
+  }
+  scrollInPx(axisDiffs){
+    for(const key of Object.keys(axisDiffs)){
+      this.axises[key] && this.axises[key].scrollInPx(axisDiffs[key]);
+    }
+    this.renderInNextFrame();
   }
   zoom(axisDiffs){
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].zoom(axisDiffs[key]);
     }
+    this.renderInNextFrame();
   }
   setViewPort(axisViewPorts){
     for(const key of Object.keys(axisViewPorts)){
       this.axises[key] && this.axises[key].setViewPort(axisViewPorts[key]);
     }
+    this.renderInNextFrame();
   }
 
   d2c(dataInAxisValue){

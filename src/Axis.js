@@ -48,6 +48,9 @@ export default class Axis{
     this.viewPort = viewPortMove(this.viewPort, diff);
     this.viewPortChanged();
   }
+  scrollInPx(diff){
+    this.scroll(diff / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort))
+  }
 
   zoom(scale){
     this.viewPort = viewPortZoom(this.viewPort, scale);

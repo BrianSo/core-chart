@@ -7,6 +7,7 @@
 <script>
   import {CoreChart, Axis} from '../../src';
   import {viewPortLength} from '../../src/util';
+  import Hammer from 'hammerjs';
 
   class MyChart extends CoreChart{
     render(){
@@ -19,9 +20,11 @@
       let cvx = this.getAxise('x').getCanvasViewPort();
       let cvy = this.getAxise('y').getCanvasViewPort();
 
+      ctx.beginPath();
       ctx.rect(cvx.min, cvy.min, viewPortLength(cvx), viewPortLength(cvy));
       ctx.stroke();
       ctx.clip();
+      ctx.closePath();
 
       this.renderLine(ctx, cvx, cvy);
       this.renderMaker(ctx, cvx, cvy);
@@ -43,13 +46,13 @@
         let end = this.d2c(this.data[this.data.length-1]);
         ctx.lineTo(end.x, cvy.max);
         ctx.lineTo(start.x, cvy.max);
-        ctx.closePath();
 
         const gradient = ctx.createLinearGradient(0, cvy.min, 0, cvy.max);
         gradient.addColorStop(0, 'rgba(250,174,50,1)');
         gradient.addColorStop(1, 'rgba(250,174,50,0)');
         ctx.fillStyle = gradient;
         ctx.fill();
+        ctx.closePath();
       }
     }
 
@@ -65,7 +68,7 @@
 
         ctx.stroke();
         ctx.closePath();
-        
+
         ctx.fillRect(pt.x - 5, pt.y - 5, 10, 10);
       }
     }
@@ -84,8 +87,8 @@
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    this.chart.getAxise('x').setCanvasViewPort({min: 0, max: canvas.width});
-    this.chart.getAxise('y').setCanvasViewPort({min: 0, max: canvas.height});
+    this.chart.getAxise('x').setCanvasViewPort({min: 10, max: canvas.width-10});
+    this.chart.getAxise('y').setCanvasViewPort({min: 10, max: canvas.height-10});
   }
 
   function onResize(){
@@ -124,8 +127,41 @@
         min: 1, max: 9
       });
 
+      // Events
       this.resizeListener = onResize.bind(this);
       window.addEventListener('resize', this.resizeListener, false);
+
+      const mc = new Hammer.Manager(this.$refs.canvas);
+
+      const pinch = new Hammer.Pinch();
+      const pan = new Hammer.Pan();
+
+      pinch.recognizeWith(pan);
+
+      mc.add([pinch, pan]);
+
+      let lastEv;
+      mc.on("pinch pan", (ev) => {
+
+        console.log(ev);
+        if(lastEv){
+          this.chart.scrollInPx({
+            x:-(ev.deltaX - lastEv.deltaX),
+            y:(ev.deltaY - lastEv.deltaY)
+          });
+        }else{
+          this.chart.scrollInPx({
+            x:-ev.deltaX,
+            y:ev.deltaY
+          });
+        }
+
+
+        lastEv = ev;
+      });
+      mc.on("panend pinchend", (ev)=>{
+        lastEv = undefined;
+      });
     },
     beforeDestroy(){
       this.resizeListener && window.removeEventListener('resize', this.resizeListener);
