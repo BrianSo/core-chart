@@ -98,24 +98,35 @@
 
       updateSize.call(this);
 
-      this.chart.setData([
-        {x: 3, y: 2},
-        {x: 5, y: 4},
-        {x: 7, y: 8},
-        {x: 9, y: 3},
-        {x: 10, y: 6}
-      ]);
+      let data = [];
+      let max = 0;
+
+      data.push({
+        x:0,
+        y:5
+      });
+      for(let i = 1; i < 1000; i++){
+        let y = data[i-1].y *  (0.8 + Math.random() * 0.41);
+        if(y>max)max = y;
+        data.push({
+          x:i,
+          y:y
+        });
+      }
+      console.log(data);
+
+      this.chart.setData(data);
       xAxis.setViewPort({
-        min: 3, max: 10
+        min: 0, max: 100
       });
       yAxis.setViewPort({
         min: 1, max: 9
       });
       xAxis.setViewPortLimit({
-        min: 1, max: 12
+        min: 1, max: 1000
       });
       yAxis.setViewPortLimit({
-        min: 0, max: 10
+        min: 0, max: max
       });
 
       // Events
