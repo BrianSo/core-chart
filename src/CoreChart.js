@@ -1,4 +1,4 @@
-
+import EventEmitter from 'wolfy87-eventemitter';
 
 
 export default class CoreChart{
@@ -8,6 +8,8 @@ export default class CoreChart{
     this.axises = {};
     this.data = [];
     this.renderId = -1;
+    this.ee = new EventEmitter();
+    this.lastTime = null;
   }
 
   setData(data){
@@ -80,13 +82,52 @@ export default class CoreChart{
 
   renderInNextFrame(){
     if(this.renderId === -1){
-      this.renderId = requestAnimationFrame(()=>this.render());
+      this.renderId = requestAnimationFrame((time)=>{
+        this.renderId = -1;
+
+        if(this.lastTime === null)
+          this.lastTime = time;
+        const deltaTime = (time - this.lastTime)/1000;
+        this.lastTime = time;
+
+        this.beforeRender(time, deltaTime);
+        this.render(time, deltaTime);
+        this.postRender(time, deltaTime);
+      });
     }
   }
-  render(){
-    this.renderId = -1;
+
+  beforeRender(time, deltaTime){
+    this.ee.emit('beforeRender',time, deltaTime);
+  }
+
+  render(time, deltaTime){
     this.getAllAxise().forEach(axis=>{
       axis.settleViewPort();
     });
+    this.ee.emit('render',time, deltaTime);
+  }
+  postRender(time, deltaTime){
+    this.ee.emit('postRender',time, deltaTime);
+  }
+
+
+  on(event, cb){
+    return this.ee.addListener(event, cb);
+  }
+  addListener(event, cb){
+    return this.ee.addListener(event, cb);
+  }
+  once(event, cb){
+    return this.ee.addOnceListener(event, cb);
+  }
+  addOnceListener(event, cb){
+    return this.ee.addOnceListener(event, cb);
+  }
+  off(event, cb){
+    return this.ee.removeListener(event, cb);
+  }
+  removeListener(event, cb){
+    return this.ee.removeListener(event, cb);
   }
 }

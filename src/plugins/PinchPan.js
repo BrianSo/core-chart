@@ -1,7 +1,12 @@
 import Hammer from 'hammerjs';
+import Tween from '@tweenjs/tween.js';
 
 export default class PinchPanManager{
-  constructor(canvas, chart){
+  constructor(canvas, chart, options){
+    options = options || {
+      x: 'x',
+      y: 'y',
+    };
     this.chart = chart;
     const mc = new Hammer.Manager(canvas);
 
@@ -14,17 +19,25 @@ export default class PinchPanManager{
 
     let lastEv;
     let lastPointers;
+    let lastTween;
+    let lastUpdateCb;
+
     mc.on("pinch pan", (ev) => {
 
+      if(lastUpdateCb) {
+        chart.off('beforeRender', lastUpdateCb);
+        lastUpdateCb = undefined;
+      }
+
       ev.pointers = [...ev.pointers];
-      console.log(ev);
+      //console.log(ev);
 
       if(lastEv){
 
 
         this.chart.scrollInPx({
-          x:-(ev.center.x - lastEv.center.x),
-          y:(ev.center.y - lastEv.center.y)
+          [options.x]:-(ev.center.x - lastEv.center.x),
+          [options.y]:(ev.center.y - lastEv.center.y)
         });
 
         if(ev.pointers.length > 1){
@@ -39,11 +52,11 @@ export default class PinchPanManager{
             const scaleX = Math.abs(thisDistanceX) < 100 ? 1 : Math.abs(lastDistanceX/thisDistanceX);
             const scaleY = Math.abs(thisDistanceY) < 100 ? 1 : Math.abs(lastDistanceY/thisDistanceY);
             this.chart.zoomFromCanvasPx({
-              x:scaleX,
-              y:scaleY
+              [options.x]:scaleX,
+              [options.y]:scaleY
             }, {
-              x:ev.center.x,
-              y:ev.center.y
+              [options.x]:ev.center.x,
+              [options.y]:ev.center.y
             });
           }
           lastPointers = ev.pointers;
@@ -51,8 +64,8 @@ export default class PinchPanManager{
 
       }else{
         this.chart.scrollInPx({
-          x:-ev.deltaX,
-          y:ev.deltaY
+          [options.x]:-ev.deltaX,
+          [options.y]:ev.deltaY
         });
       }
 
@@ -60,8 +73,30 @@ export default class PinchPanManager{
       lastEv = ev;
     });
     mc.on("panend pinchend", (ev)=>{
+      const lastEvInScope = lastEv;
       lastEv = undefined;
       lastPointers = undefined;
+
+      if(Math.abs(lastEvInScope.velocityX * 16) > 3){
+        let lastVelocity = lastEvInScope.velocityX * 16;
+        console.log(lastVelocity);
+        const velocityUpdate = (time, deltaTime)=>{
+          if(Math.abs(lastVelocity) < 1){
+            chart.off('beforeRender', velocityUpdate);
+          }
+
+          if(deltaTime > 0){
+            lastVelocity *= 1 - 2 * deltaTime;
+          }
+          chart.scrollInPx({x:-lastVelocity});
+        };
+        chart.on('beforeRender', velocityUpdate);
+        lastUpdateCb = velocityUpdate;
+      }
+    });
+
+    chart.on('beforeRender',(time)=>{
+      Tween.update(time);
     });
   }
 }

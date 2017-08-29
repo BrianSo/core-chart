@@ -5,7 +5,7 @@
 </template>
 
 <script>
-  import PinchPanManager from './PinchPan';
+  import PinchPanManager from '../../src/plugins/PinchPan';
   import {CoreChart, Axis, YAxis, util} from '../../src';
   const {viewPortLength} = util;
 
@@ -159,7 +159,6 @@
           y:y
         });
       }
-      console.log(data);
 
       this.chart.setData(data);
       xAxis.setViewPort({

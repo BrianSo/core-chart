@@ -12,7 +12,9 @@
     "test": "npm run unit"
   },
   "dependencies": {
-    "hammerjs": "^2.0.8"
+    "@tweenjs/tween.js": "^17.1.0",
+    "hammerjs": "^2.0.8",
+    "wolfy87-eventemitter": "^5.2.2"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
