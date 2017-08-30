@@ -1,8 +1,15 @@
 import EventEmitter from 'wolfy87-eventemitter';
+import {Animation, DurationAnimation} from './Animation';
 
+const performanceNowOrDateNow = ()=>{
+  if(window.performance && window.performance.now){
+    return window.performance.now();
+  }
+  return Date.now();
+};
 
 export default class CoreChart{
-  constructor(canvas){
+  constructor(canvas) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.axises = {};
@@ -10,6 +17,7 @@ export default class CoreChart{
     this.renderId = -1;
     this.ee = new EventEmitter();
     this.lastTime = null;
+    this.animations = [];
   }
 
   setData(data){
@@ -17,11 +25,35 @@ export default class CoreChart{
     this.renderInNextFrame();
   }
 
-  scroll(axisDiffs, scrollLimit){
-    for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].scroll(axisDiffs[key], scrollLimit);
+  scroll(axisDiffs, scrollLimit, options){
+    options = options || {};
+    options = Object.assign({
+      animated: false,
+      animationDuration: 300,
+      cancelAnimation: false
+    },options);
+
+    if(options.cancelAnimation) {
+      this.cancelAllAnimation();
     }
-    this.renderInNextFrame();
+
+    if(options.animated){
+      this.startAnimation(new DurationAnimation({
+        duration: options.animationDuration,
+        onUpdate:(deltaTime, time, progress, deltaProgress)=>{
+          for(const key of Object.keys(axisDiffs)){
+            this.axises[key] && this.axises[key].scroll(axisDiffs[key] * deltaProgress, scrollLimit);
+          }
+          this.renderInNextFrame();
+        }
+      }));
+    }else{
+
+      for(const key of Object.keys(axisDiffs)){
+        this.axises[key] && this.axises[key].scroll(axisDiffs[key], scrollLimit);
+      }
+      this.renderInNextFrame();
+    }
   }
   scrollInPx(axisDiffs, scrollLimit){
     for(const key of Object.keys(axisDiffs)){
@@ -82,7 +114,8 @@ export default class CoreChart{
 
   renderInNextFrame(){
     if(this.renderId === -1){
-      this.renderId = requestAnimationFrame((time)=>{
+      this.renderId = requestAnimationFrame((rafTime)=>{
+        const time = performanceNowOrDateNow();
         this.renderId = -1;
 
         if(this.lastTime === null)
@@ -99,6 +132,13 @@ export default class CoreChart{
 
   beforeRender(time, deltaTime){
     this.ee.emit('beforeRender',time, deltaTime);
+
+    for(let i = this.animations.length - 1; i >= 0; i--){
+      if(this.animations[i].onUpdate(time) === true){
+        this.animations[i].end(false);
+        this.animations.splice(i, 1);
+      }
+    }
   }
 
   render(time, deltaTime){
@@ -129,5 +169,17 @@ export default class CoreChart{
   }
   removeListener(event, cb){
     return this.ee.removeListener(event, cb);
+  }
+
+  startAnimation(animation){
+    this.animations.push(animation);
+    animation.onStart(performanceNowOrDateNow());
+    this.renderInNextFrame();
+  }
+  cancelAllAnimation(){
+    for(const ani of this.animations){
+      ani.end(true);
+    }
+    this.animations = [];
   }
 }

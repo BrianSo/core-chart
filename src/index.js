@@ -1,6 +1,7 @@
 import CoreChart from './CoreChart';
 import {Axis, YAxis} from './Axis';
 import * as util from './util';
+import Animation from './Animation';
 
 import * as Plugins from './plugins';
 
@@ -10,5 +11,6 @@ export {
   Axis,
   YAxis,
   util,
-  Plugins
+  Plugins,
+  Animation
 };
