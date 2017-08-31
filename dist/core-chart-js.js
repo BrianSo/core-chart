@@ -1480,7 +1480,6 @@ var CoreChart = function () {
         this.startAnimation(new __WEBPACK_IMPORTED_MODULE_6__Animation__["b" /* DurationAnimation */]({
           duration: options.animationDuration,
           onUpdate: function onUpdate(deltaTime, time, progress, deltaProgress) {
-            console.log(deltaTime, time, progress, deltaProgress);
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -1510,13 +1509,12 @@ var CoreChart = function () {
           }
         }));
       } else {
-
-        console.log('scroll');
         var _iteratorNormalCompletion2 = true;
         var _didIteratorError2 = false;
         var _iteratorError2 = undefined;
 
         try {
+
           for (var _iterator2 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(axisDiffs)), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
             var key = _step2.value;
 
@@ -1661,18 +1659,17 @@ var CoreChart = function () {
       this.renderInNextFrame();
     }
   }, {
-    key: 'd2c',
-    value: function d2c(dataInAxisValue) {
-      var result = {};
+    key: 'setViewPortLimit',
+    value: function setViewPortLimit(axisViewPorts) {
       var _iteratorNormalCompletion7 = true;
       var _didIteratorError7 = false;
       var _iteratorError7 = undefined;
 
       try {
-        for (var _iterator7 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(dataInAxisValue)), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+        for (var _iterator7 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(axisViewPorts)), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
           var key = _step7.value;
 
-          if (this.axises[key]) result[key] = this.axises[key].d2c(dataInAxisValue[key]);
+          this.axises[key] && this.axises[key].setViewPortLimit(axisViewPorts[key]);
         }
       } catch (err) {
         _didIteratorError7 = true;
@@ -1689,21 +1686,21 @@ var CoreChart = function () {
         }
       }
 
-      return result;
+      this.renderInNextFrame();
     }
   }, {
-    key: 'c2d',
-    value: function c2d(dataInCanvasValue) {
+    key: 'd2c',
+    value: function d2c(dataInAxisValue) {
       var result = {};
       var _iteratorNormalCompletion8 = true;
       var _didIteratorError8 = false;
       var _iteratorError8 = undefined;
 
       try {
-        for (var _iterator8 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(dataInCanvasValue)), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
+        for (var _iterator8 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(dataInAxisValue)), _step8; !(_iteratorNormalCompletion8 = (_step8 = _iterator8.next()).done); _iteratorNormalCompletion8 = true) {
           var key = _step8.value;
 
-          if (this.axises[key]) result[key] = this.axises[key].c2d(dataInCanvasValue[key]);
+          if (this.axises[key]) result[key] = this.axises[key].d2c(dataInAxisValue[key]);
         }
       } catch (err) {
         _didIteratorError8 = true;
@@ -1716,6 +1713,37 @@ var CoreChart = function () {
         } finally {
           if (_didIteratorError8) {
             throw _iteratorError8;
+          }
+        }
+      }
+
+      return result;
+    }
+  }, {
+    key: 'c2d',
+    value: function c2d(dataInCanvasValue) {
+      var result = {};
+      var _iteratorNormalCompletion9 = true;
+      var _didIteratorError9 = false;
+      var _iteratorError9 = undefined;
+
+      try {
+        for (var _iterator9 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(__WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_keys___default()(dataInCanvasValue)), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
+          var key = _step9.value;
+
+          if (this.axises[key]) result[key] = this.axises[key].c2d(dataInCanvasValue[key]);
+        }
+      } catch (err) {
+        _didIteratorError9 = true;
+        _iteratorError9 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion9 && _iterator9.return) {
+            _iterator9.return();
+          }
+        } finally {
+          if (_didIteratorError9) {
+            throw _iteratorError9;
           }
         }
       }
@@ -1831,27 +1859,27 @@ var CoreChart = function () {
   }, {
     key: 'cancelAllAnimation',
     value: function cancelAllAnimation() {
-      var _iteratorNormalCompletion9 = true;
-      var _didIteratorError9 = false;
-      var _iteratorError9 = undefined;
+      var _iteratorNormalCompletion10 = true;
+      var _didIteratorError10 = false;
+      var _iteratorError10 = undefined;
 
       try {
-        for (var _iterator9 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(this.animations), _step9; !(_iteratorNormalCompletion9 = (_step9 = _iterator9.next()).done); _iteratorNormalCompletion9 = true) {
-          var ani = _step9.value;
+        for (var _iterator10 = __WEBPACK_IMPORTED_MODULE_1_babel_runtime_core_js_get_iterator___default()(this.animations), _step10; !(_iteratorNormalCompletion10 = (_step10 = _iterator10.next()).done); _iteratorNormalCompletion10 = true) {
+          var ani = _step10.value;
 
           ani.end(true);
         }
       } catch (err) {
-        _didIteratorError9 = true;
-        _iteratorError9 = err;
+        _didIteratorError10 = true;
+        _iteratorError10 = err;
       } finally {
         try {
-          if (!_iteratorNormalCompletion9 && _iterator9.return) {
-            _iterator9.return();
+          if (!_iteratorNormalCompletion10 && _iterator10.return) {
+            _iterator10.return();
           }
         } finally {
-          if (_didIteratorError9) {
-            throw _iteratorError9;
+          if (_didIteratorError10) {
+            throw _iteratorError10;
           }
         }
       }

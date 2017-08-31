@@ -79,6 +79,12 @@ export default class CoreChart{
     }
     this.renderInNextFrame();
   }
+  setViewPortLimit(axisViewPorts){
+    for(const key of Object.keys(axisViewPorts)){
+      this.axises[key] && this.axises[key].setViewPortLimit(axisViewPorts[key]);
+    }
+    this.renderInNextFrame();
+  }
 
   d2c(dataInAxisValue){
     const result = {};

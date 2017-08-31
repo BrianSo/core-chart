@@ -128,7 +128,7 @@ export class Axis{
     let n = Math.log2(rate);
     n = Math.ceil(n);
 
-    return this.ticks(Math.pow(2, n));
+    return this.ticks(Math.pow(2, n)); //TODO return desiredRange
   }
   ticks(desiredRange){
     desiredRange = desiredRange || 1;
