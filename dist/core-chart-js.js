@@ -1367,13 +1367,73 @@ var Axis = function () {
     value: function ticks(desiredRange) {
       desiredRange = desiredRange || 1;
 
-      var ticksPos = [];
+      var ticks = [];
       //find minimum tick
       var minTick = this.viewPort.min - Math.abs(this.viewPort.min % desiredRange);
       for (var t = minTick; t <= this.viewPort.max; t += desiredRange) {
-        ticksPos.push(t);
+        ticks.push(t);
       }
-      return ticksPos;
+      return { ticks: ticks, desiredRange: desiredRange };
+    }
+
+    /**
+     * find the viewable points (starting, ending index) on this axis
+     * assuming the point values are sorted on this axis
+     *
+     * @param points
+     * @returns {{min: number, max: number}} - the starting and ending index that should be rendered
+     */
+
+  }, {
+    key: 'findRenderingRangeOfPoints',
+    value: function findRenderingRangeOfPoints(points) {
+      var _viewPort = this.viewPort,
+          min = _viewPort.min,
+          max = _viewPort.max;
+
+
+      var resultMin = this.binaryIndexOf(points, min);
+      var resultMax = this.binaryIndexOf(points, max);
+
+      var result = {
+        min: resultMin.index,
+        max: resultMax.index
+      };
+
+      if (resultMin.index > 0 && min < resultMin.value) {
+        result.min -= 1;
+      }
+
+      if (resultMax.index < points.length - 1 && max > resultMax.value) {
+        result.max += 1;
+      }
+      return result;
+    }
+
+    // private function, a binary search
+
+  }, {
+    key: 'binaryIndexOf',
+    value: function binaryIndexOf(points, searchElement) {
+
+      var minIndex = 0;
+      var maxIndex = points.length - 1;
+      var currentIndex = void 0;
+      var currentElement = void 0;
+
+      while (minIndex <= maxIndex) {
+        currentIndex = (minIndex + maxIndex) / 2 | 0;
+        currentElement = points[currentIndex][this.name];
+
+        if (currentElement < searchElement) {
+          minIndex = currentIndex + 1;
+        } else if (currentElement > searchElement) {
+          maxIndex = currentIndex - 1;
+        } else {
+          break;
+        }
+      }
+      return { index: currentIndex, value: currentElement };
     }
   }]);
 

@@ -128,18 +128,71 @@ export class Axis{
     let n = Math.log2(rate);
     n = Math.ceil(n);
 
-    return this.ticks(Math.pow(2, n)); //TODO return desiredRange
+    return this.ticks(Math.pow(2, n));
   }
   ticks(desiredRange){
     desiredRange = desiredRange || 1;
 
-    let ticksPos = [];
+    let ticks = [];
     //find minimum tick
     const minTick = this.viewPort.min - Math.abs(this.viewPort.min % desiredRange);
     for(let t = minTick; t <= this.viewPort.max; t+= desiredRange){
-      ticksPos.push(t);
+      ticks.push(t);
     }
-    return ticksPos;
+    return {ticks, desiredRange};
+  }
+
+  /**
+   * find the viewable points (starting, ending index) on this axis
+   * assuming the point values are sorted on this axis
+   *
+   * @param points
+   * @returns {{min: number, max: number}} - the starting and ending index that should be rendered
+   */
+  findRenderingRangeOfPoints(points){
+    let {min, max} = this.viewPort;
+
+    const resultMin = this.binaryIndexOf(points, min);
+    const resultMax = this.binaryIndexOf(points, max);
+
+    const result = {
+      min: resultMin.index,
+      max: resultMax.index
+    };
+
+    if(resultMin.index > 0 && min < resultMin.value){
+      result.min -= 1;
+    }
+
+    if(resultMax.index < points.length - 1 && max > resultMax.value){
+      result.max += 1;
+    }
+    return result;
+  }
+
+  // private function, a binary search
+  binaryIndexOf(points, searchElement) {
+
+    let minIndex = 0;
+    let maxIndex = points.length - 1;
+    let currentIndex;
+    let currentElement;
+
+    while (minIndex <= maxIndex) {
+      currentIndex = (minIndex + maxIndex) / 2 | 0;
+      currentElement = points[currentIndex][this.name];
+
+      if (currentElement < searchElement) {
+        minIndex = currentIndex + 1;
+      }
+      else if (currentElement > searchElement) {
+        maxIndex = currentIndex - 1;
+      }
+      else {
+        break;
+      }
+    }
+    return {index: currentIndex, value:currentElement};
   }
 }
 

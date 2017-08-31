@@ -91,6 +91,30 @@ describe('Axis', ()=>{
     xAxis.settleViewPort();
     expect(xAxis.getViewPort().min).to.be.closeTo(1, 0.01);
     expect(xAxis.getViewPort().max).to.be.closeTo(10, 0.01);
-  })
+  });
+
+  describe('find the range of the viewable points', ()=>{
+    const xAxis = new Axis('x');
+    const points = [1,2,3.3,4,6,6.5,7,7.1,8,9,10].map(x=>({x}));
+
+    it('includes all',()=>{
+      xAxis.setViewPort({min: 0, max: 40});
+      let result = xAxis.findRenderingRangeOfPoints(points);
+      expect(result.min).to.be.equal(0);
+      expect(result.max).to.be.equal(10);
+    });
+    it('get exactly one more',()=>{
+      xAxis.setViewPort({min: 2.5, max: 7.5});
+      let result = xAxis.findRenderingRangeOfPoints(points);
+      expect(result.min).to.be.equal(1);
+      expect(result.max).to.be.equal(8);
+    });
+    it('just the overlapped value',()=>{
+      xAxis.setViewPort({min: 2, max: 8});
+      let result = xAxis.findRenderingRangeOfPoints(points);
+      expect(result.min).to.be.equal(1);
+      expect(result.max).to.be.equal(8);
+    });
+  });
 });
 
