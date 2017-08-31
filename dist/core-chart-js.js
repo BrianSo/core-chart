@@ -804,7 +804,11 @@ var DurationAnimation = function (_SimpleAnimation) {
 
   return DurationAnimation;
 }(SimpleAnimation);
-/* harmony default export */ __webpack_exports__["a"] = (Animation);
+/* harmony default export */ __webpack_exports__["a"] = ({
+  Animation: Animation,
+  SimpleAnimation: SimpleAnimation,
+  DurationAnimation: DurationAnimation
+});
 
 /***/ }),
 /* 39 */
@@ -1453,12 +1457,12 @@ var YAxis = function (_Axis) {
     key: 'd2c',
     value: function d2c(axisValue) {
       var value = __WEBPACK_IMPORTED_MODULE_2_babel_runtime_helpers_get___default()(YAxis.prototype.__proto__ || __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_get_prototype_of___default()(YAxis.prototype), 'd2c', this).call(this, axisValue);
-      return __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__util__["viewPortLength"])(this.canvasViewPort) - value;
+      return this.canvasViewPort.min + this.canvasViewPort.max - value;
     }
   }, {
     key: 'c2d',
     value: function c2d(canvasValue) {
-      var value = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_8__util__["viewPortLength"])(this.canvasViewPort) - canvasValue;
+      var value = this.canvasViewPort.min + this.canvasViewPort.max - canvasValue;
       return __WEBPACK_IMPORTED_MODULE_2_babel_runtime_helpers_get___default()(YAxis.prototype.__proto__ || __WEBPACK_IMPORTED_MODULE_0_babel_runtime_core_js_object_get_prototype_of___default()(YAxis.prototype), 'c2d', this).call(this, value);
     }
   }]);

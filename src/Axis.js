@@ -199,10 +199,10 @@ export class Axis{
 export class YAxis extends Axis{
   d2c(axisValue){
     let value = super.d2c(axisValue);
-    return viewPortLength(this.canvasViewPort) - value;
+    return this.canvasViewPort.min + this.canvasViewPort.max - value;
   }
   c2d(canvasValue){
-    let value = viewPortLength(this.canvasViewPort) - canvasValue;
+    let value = this.canvasViewPort.min + this.canvasViewPort.max - canvasValue;
     return super.c2d(value);
   }
 }

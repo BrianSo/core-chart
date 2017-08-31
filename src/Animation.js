@@ -78,4 +78,8 @@ export class DurationAnimation extends SimpleAnimation{
     return shouldEnd;
   }
 }
-export default Animation;
+export default {
+  Animation,
+  SimpleAnimation,
+  DurationAnimation
+};

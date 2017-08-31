@@ -1,4 +1,4 @@
-import Axis from '../Axis';
+import {Axis, YAxis} from '../Axis';
 
 
 describe('Axis', ()=>{
@@ -118,3 +118,48 @@ describe('Axis', ()=>{
   });
 });
 
+describe('YAxis', ()=>{
+  it('should translate the axis value to canvas value', ()=>{
+    const axis = new YAxis('whatever');
+
+    axis.setCanvasViewPort({min: 0, max: 10});
+    axis.setViewPort({min: 0, max: 10});
+    expect(axis.d2c(5)).to.be.closeTo(5, 0.01);
+
+    axis.setCanvasViewPort({min: 0, max: 5});
+    axis.setViewPort({min: 0, max: 10});
+    expect(axis.d2c(5)).to.be.closeTo(2.5, 0.01);
+
+    axis.setCanvasViewPort({min: 5, max: 10});
+    axis.setViewPort({min: 0, max: 10});
+    expect(axis.d2c(5)).to.be.closeTo(7.5, 0.01);
+
+    axis.setCanvasViewPort({min: 0, max: 10});
+    axis.setViewPort({min: 2.5, max: 7.5});
+    expect(axis.d2c(5)).to.be.closeTo(5, 0.01);
+
+    axis.setCanvasViewPort({min: 0, max: 10});
+    axis.setViewPort({min: 0, max: 5});
+    expect(axis.d2c(5)).to.be.closeTo(0, 0.01);
+  });
+
+  it('c2d and d2c should be the inverse function of each other', ()=>{
+    const xAxis = new Axis('x');
+
+    xAxis.setCanvasViewPort({min: 3, max: 10});
+    xAxis.setViewPort({min: 7, max: 12});
+    expect(xAxis.c2d(xAxis.d2c(5))).to.be.closeTo(5, 0.01);
+
+    xAxis.setCanvasViewPort({min: 3, max: 10});
+    xAxis.setViewPort({min: 7, max: 12});
+    expect(xAxis.c2d(xAxis.d2c(7))).to.be.closeTo(7, 0.01);
+
+    xAxis.setCanvasViewPort({min: 3, max: 10});
+    xAxis.setViewPort({min: 7, max: 12});
+    expect(xAxis.d2c(xAxis.c2d(12))).to.be.closeTo(12, 0.01);
+
+    xAxis.setCanvasViewPort({min: 3, max: 10});
+    xAxis.setViewPort({min: 7, max: 12});
+    expect(xAxis.d2c(xAxis.c2d(-120))).to.be.closeTo(-120, 0.01);
+  });
+});
