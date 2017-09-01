@@ -248,12 +248,15 @@ describe('Axis', ()=>{
       expect(axis.ticks(20).ticks).to.be.deep.equal([0,20,40,60,80,100]);
       expect(axis.ticks(20).interval).to.be.equal(20);
 
-      axis.setViewPort({min: -1, max: 99});
+      axis.setViewPort({min: 5, max: 99});
       expect(axis.ticks(20).ticks).to.be.deep.equal([0,20,40,60,80]);
 
+      axis.setViewPort({min: -95, max: -10});
+      expect(axis.ticks(20).ticks).to.be.deep.equal([-100,-80,-60,-40,-20]);
+
       axis.setViewPort({min: -5, max: 5});
-      expect(axis.ticks()).to.be.deep.equal([-5,-4,-3,-2,-1,0,1,2,3,4,5]);
-      expect(axis.ticks(0)).to.be.deep.equal([-5,-4,-3,-2,-1,0,1,2,3,4,5]);
+      expect(axis.ticks().ticks).to.be.deep.equal([-5,-4,-3,-2,-1,0,1,2,3,4,5]);
+      expect(axis.ticks(0).ticks).to.be.deep.equal([-5,-4,-3,-2,-1,0,1,2,3,4,5]);
     });
 
     it('find a number of ticks', ()=>{

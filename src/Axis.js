@@ -135,7 +135,11 @@ export class Axis{
 
     let ticks = [];
     //find minimum tick
-    const minTick = this.viewPort.min - Math.abs(this.viewPort.min % desiredInterval);
+    // (integer division) this.viewPort / desiredInterval
+    const remainder = this.viewPort.min % desiredInterval;
+    let minTick = this.viewPort.min - remainder;
+    if(remainder < 0)
+      minTick -= desiredInterval;
     for(let t = minTick; t <= this.viewPort.max; t+= desiredInterval){
       ticks.push(t);
     }
