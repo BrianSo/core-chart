@@ -1,6 +1,7 @@
 <template>
     <div>
       <canvas ref="canvas"></canvas>
+      <input type="checkbox" id="render_preview_ck_box" v-model="shouldRenderPreview"><label for="render_preview_ck_box">Render Preview</label>
     </div>
 </template>
 
@@ -10,6 +11,8 @@
   const {viewPortLength} = util;
 
   class MyChart extends CoreChart {
+    shouldRenderPreview = false;
+
     render(time, deltaTime) {
       super.render(time, deltaTime);
       const ctx = this.ctx;
@@ -23,15 +26,63 @@
       ctx.beginPath();
       ctx.rect(cvx.min, cvy.min, viewPortLength(cvx), viewPortLength(cvy));
       ctx.stroke();
-//      ctx.clip();
+      ctx.clip();
       ctx.closePath();
 
       this.renderTicks(ctx, cvx, cvy);
       this.renderLine(ctx, cvx, cvy);
-      //this.renderMaker(ctx, cvx, cvy);
+      if(this.shouldRenderPreview)
+        this.renderPreview(ctx, cvx, cvy);
+//      this.renderMaker(ctx, cvx, cvy);
       ctx.restore();
     }
 
+    renderPreview(ctx, cvx, cvy){
+
+      const previewCanvasRegion = {
+        x:{
+          min: 20, max: 320
+        },
+        y:{
+          min: 20, max: 100
+        }
+      };
+
+      const xAxis = this.getAxise('x');
+      const yAxis = this.getAxise('y');
+      const xAxisViewPort = xAxis.getViewPort();
+      const yAxisViewPort = yAxis.getViewPort();
+      const xAxisCanvasViewPort = xAxis.getCanvasViewPort();
+      const yAxisCanvasViewPort = yAxis.getCanvasViewPort();
+      const yAxisViewPortLimit = yAxis.getViewPortLimit();
+      xAxis.setCanvasViewPort(previewCanvasRegion.x);
+      yAxis.setCanvasViewPort(previewCanvasRegion.y);
+      xAxis.setViewPort(xAxis.getViewPortLimit());
+
+      let minMax = yAxis.findMaxMinValueOfPoints(this.data);
+
+      yAxis.setViewPortLimit(minMax);
+      yAxis.setViewPort(minMax);
+      ctx.save();
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';
+      ctx.beginPath();
+      ctx.rect(previewCanvasRegion.x.min,previewCanvasRegion.y.min, viewPortLength(previewCanvasRegion.x), viewPortLength(previewCanvasRegion.y));
+      ctx.fill();
+      ctx.closePath();
+      this.renderLine(ctx, previewCanvasRegion.x, previewCanvasRegion.y);
+      ctx.beginPath();
+      ctx.rect(xAxis.d2c(xAxisViewPort.min), yAxis.d2c(yAxisViewPort.min),
+        xAxis.d2c(xAxisViewPort.max)-xAxis.d2c(xAxisViewPort.min),
+        yAxis.d2c(yAxisViewPort.max)-yAxis.d2c(yAxisViewPort.min));
+      ctx.stroke();
+      ctx.closePath();
+      ctx.restore();
+      xAxis.setCanvasViewPort(xAxisCanvasViewPort);
+      yAxis.setCanvasViewPort(yAxisCanvasViewPort);
+      xAxis.setViewPort(xAxisViewPort);
+      yAxis.setViewPort(yAxisViewPort);
+      yAxis.setViewPortLimit(yAxisViewPortLimit);
+    }
 
     renderTicks(ctx, cvx, cvy) {
       const xAxis = this.getAxise('x');
@@ -133,10 +184,16 @@
     data() {
       return {
         chart: null,
-        resizeListener: null
+        resizeListener: null,
+        shouldRenderPreview: false,
       }
     },
     computed: {},
+    watch:{
+      shouldRenderPreview(val){
+        this.chart.shouldRenderPreview = val;
+      }
+    },
     mounted() {
       this.chart = new MyChart(this.$refs.canvas);
       const xAxis = new Axis('x');
