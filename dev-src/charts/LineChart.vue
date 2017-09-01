@@ -23,7 +23,7 @@
       ctx.beginPath();
       ctx.rect(cvx.min, cvy.min, viewPortLength(cvx), viewPortLength(cvy));
       ctx.stroke();
-      ctx.clip();
+//      ctx.clip();
       ctx.closePath();
 
       this.renderTicks(ctx, cvx, cvy);
@@ -79,17 +79,19 @@
     }
     renderLine(ctx, cvx, cvy) {
       if (this.data.length) {
-        let start = this.d2c(this.data[0]);
+        let {min, max} = this.getAxise('x').findRenderingRangeOfPoints(this.data);
+        let start = this.d2c(this.data[min]);
+        let end = this.d2c(this.data[max]);
 
         ctx.beginPath();
         ctx.lineTo(start.x, start.y);
-        for (let pt of this.data) {
+        for (let i = min; i <= max; i++) {
+          let pt = this.data[i];
           pt = this.d2c(pt);
           ctx.lineTo(pt.x, pt.y);
         }
         ctx.stroke();
 
-        let end = this.d2c(this.data[this.data.length - 1]);
         ctx.lineTo(end.x, cvy.max);
         ctx.lineTo(start.x, cvy.max);
 
@@ -170,20 +172,7 @@
           y:y
         });
 
-        let toScroll = 1;
-        let left = toScroll;
-
-        const scrollAnimation = (time, deltaTime)=>{
-          let nowScroll = toScroll * 0.1;
-          if(left < nowScroll){
-            nowScroll = left;
-            this.chart.off('beforeRender',scrollAnimation);
-          }
-          left -= nowScroll;
-          this.chart.scroll({x:nowScroll}, true);
-
-        };
-        this.chart.on('beforeRender',scrollAnimation);
+        this.chart.scroll({x:1}, true, {animated: true});
         this.chart.renderInNextFrame();
       },1000);
 
@@ -202,6 +191,18 @@
       });
 
       // Events
+
+      // automatic find suitable viewport for y axis
+      this.chart.on('beforeRender', ()=>{
+        let range = xAxis.findRenderingRangeOfPoints(this.chart.data);
+        let {min, max} = yAxis.findMaxMinValueOfPoints(this.chart.data, range.min, range.max);
+
+        let length = max - min;
+        max += length * 0.1;
+        min -= length * 0.1;
+        this.chart.setViewPortLimit({y:{min,max}});
+        this.chart.setViewPort({y:{min,max}});
+      });
       this.resizeListener = onResize.bind(this);
       window.addEventListener('resize', this.resizeListener, false);
 

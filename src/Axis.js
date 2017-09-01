@@ -169,6 +169,22 @@ export class Axis{
     }
     return result;
   }
+  findMaxMinValueOfPoints(points, begin, end){
+    begin = begin || 0;
+    end = end || points.length-1;
+
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+
+    for(let i = begin;i <= end; i++){
+      const value = points[i][this.name];
+      if(value > max)
+        max = value;
+      if(value < min)
+        min = value;
+    }
+    return {min, max};
+  }
 
   // private function, a binary search
   binaryIndexOf(points, searchElement) {
