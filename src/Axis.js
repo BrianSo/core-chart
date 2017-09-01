@@ -130,16 +130,16 @@ export class Axis{
 
     return this.ticks(Math.pow(2, n));
   }
-  ticks(desiredRange){
-    desiredRange = desiredRange || 1;
+  ticks(desiredInterval){
+    desiredInterval = desiredInterval || 1;
 
     let ticks = [];
     //find minimum tick
-    const minTick = this.viewPort.min - Math.abs(this.viewPort.min % desiredRange);
-    for(let t = minTick; t <= this.viewPort.max; t+= desiredRange){
+    const minTick = this.viewPort.min - Math.abs(this.viewPort.min % desiredInterval);
+    for(let t = minTick; t <= this.viewPort.max; t+= desiredInterval){
       ticks.push(t);
     }
-    return {ticks, desiredRange};
+    return {ticks, interval: desiredInterval};
   }
 
   /**
