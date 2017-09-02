@@ -73,6 +73,13 @@ export default class CoreChart{
     }
     this.renderInNextFrame();
   }
+
+  setCanvasViewPort(axisViewPorts){
+    for(const key of Object.keys(axisViewPorts)){
+      this.axises[key] && this.axises[key].setCanvasViewPort(axisViewPorts[key]);
+    }
+    this.renderInNextFrame();
+  }
   setViewPort(axisViewPorts){
     for(const key of Object.keys(axisViewPorts)){
       this.axises[key] && this.axises[key].setViewPort(axisViewPorts[key]);
