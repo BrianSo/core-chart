@@ -1,14 +1,16 @@
 {
   "name": "core-chart-js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A minimal library for building complex, efficient and highly customized chart",
-  "keywords": ["chart", "plot"],
+  "keywords": [
+    "chart",
+    "plot"
+  ],
   "author": "Brian So <briansostudio@gmail.com>",
   "license": "MIT",
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/BrianSo/core-chart.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BrianSo/core-chart.git"
   },
   "main": "dist/core-chart-js.js",
   "scripts": {
