@@ -1,11 +1,19 @@
 {
   "name": "core-chart-js",
   "version": "0.0.2",
-  "description": "core-chart-js",
+  "description": "A minimal library for building complex, efficient and highly customized chart",
+  "keywords": ["chart", "plot"],
   "author": "Brian So <briansostudio@gmail.com>",
-  "private": true,
+  "license": "MIT",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com/BrianSo/core-chart.git"
+  },
   "main": "dist/core-chart-js.js",
   "scripts": {
+    "preversion": "npm test",
+    "version": "npm run build && git add dist",
     "dev": "node dev-build/dev-server.js",
     "build": "node build/build.js && node build/build.js --env build",
     "unit-dev": "cross-env BABEL_ENV=test karma start test/unit/karma.conf.js",
