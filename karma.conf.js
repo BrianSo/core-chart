@@ -8,7 +8,13 @@ module.exports = function(config) {
     preprocessors: {
       "src/**/*.ts": ["karma-typescript"], // *.tsx for React Jsx
     },
-    reporters: ["progress", "karma-typescript"],
-    browsers: ["PhantomJS"]
+    reporters: ["spec", "karma-typescript"],
+    browsers: ["PhantomJS"],
+    karmaTypescriptConfig:{
+      reports:{
+        html:"./coverage",
+        "text-summary":""
+      }
+    }
   });
 };
