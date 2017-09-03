@@ -58,14 +58,14 @@ export class Axis{
     return offset + this.viewPort.min;
   }
 
-  scroll(diff:number, scrollLimit:boolean){
+  scroll(diff:number, scrollLimit:boolean = false){
     this.viewPort = viewPortMove(this.viewPort, diff);
     if(scrollLimit){
       this.viewPortLimit = viewPortMove(this.viewPortLimit, diff);
     }
     this.viewPortChanged();
   }
-  scrollInPx(diff:number, scrollLimit:boolean){
+  scrollInPx(diff:number, scrollLimit:boolean = false){
     this.scroll(diff / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort), scrollLimit)
   }
 
@@ -135,7 +135,7 @@ export class Axis{
     const rate = width/ maxNumberOfTicks;
 
     // Log_2(rate) >= n
-    let n = Math.log2(rate);
+    let n = Math.log(rate) / Math.log(2);
     n = Math.ceil(n);
 
     return this.ticks(Math.pow(2, n));

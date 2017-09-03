@@ -46,8 +46,7 @@ export default class CoreChart{
     this.renderInNextFrame();
   }
 
-  scroll(axisDiffs:DataValue<number>, scrollLimit:boolean, options: ScrollOptions){
-    options = options || {};
+  scroll(axisDiffs:DataValue<number>, scrollLimit:boolean = false, options: ScrollOptions = {}){
     options = Object.assign({
       animated: false,
       animationDuration: 300,
@@ -76,7 +75,7 @@ export default class CoreChart{
       this.renderInNextFrame();
     }
   }
-  scrollInPx(axisDiffs:DataValue<number>, scrollLimit:boolean){
+  scrollInPx(axisDiffs:DataValue<number>, scrollLimit:boolean = false){
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].scrollInPx(axisDiffs[key], scrollLimit);
     }
@@ -186,23 +185,33 @@ export default class CoreChart{
   }
 
 
+  on(event:'beforeRender', cb:(time: number, deltaTime: number)=>void):this;
+  on(event:'render', cb:(time: number, deltaTime: number)=>void):this;
+  on(event:'postRender', cb:(time: number, deltaTime: number)=>void):this;
   on(event:string, cb: Function){
-    return this.ee.addListener(event, cb);
+    this.ee.addListener(event, cb);
+    return this;
   }
+
   addListener(event:string, cb:Function){
-    return this.ee.addListener(event, cb);
+    this.ee.addListener(event, cb);
+    return this;
   }
   once(event:string, cb:Function){
-    return this.ee.addOnceListener(event, cb);
+    this.ee.addOnceListener(event, cb);
+    return this;
   }
   addOnceListener(event:string, cb:Function){
-    return this.ee.addOnceListener(event, cb);
+    this.ee.addOnceListener(event, cb);
+    return this;
   }
   off(event:string, cb:Function){
-    return this.ee.removeListener(event, cb);
+    this.ee.removeListener(event, cb);
+    return this;
   }
   removeListener(event:string, cb:Function){
-    return this.ee.removeListener(event, cb);
+    this.ee.removeListener(event, cb);
+    return this;
   }
 
   startAnimation(animation:Animation){
