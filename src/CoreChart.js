@@ -110,18 +110,18 @@ export default class CoreChart{
     return result;
   }
 
-  setAxise(axis) {
+  setAxis(axis) {
     this.axises[axis.name] = axis;
   }
 
-  getAxise(name){
+  getAxis(name){
     return this.axises[name];
   }
-  removeAxise(name){
+  removeAxis(name){
     delete this.axises[name];
   }
 
-  getAllAxise(){
+  getAllAxises(){
     return Object.keys(this.axises).map(name=>this.axises[name]);
   }
 
@@ -155,7 +155,7 @@ export default class CoreChart{
   }
 
   render(time, deltaTime){
-    this.getAllAxise().forEach(axis=>{
+    this.getAllAxises().forEach(axis=>{
       axis.settleViewPort();
     });
     this.ee.emit('render',time, deltaTime);

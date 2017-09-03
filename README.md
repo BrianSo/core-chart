@@ -63,8 +63,8 @@ const xAxis = new Axis('x');
 const yAxis = new YAxis('y'); // as canvas has inversed y axis value, YAxis fixes this
 
 const chart = new CoreChart(canvas);
-chart.setAxise(xAxis);
-chart.setAxise(yAxis);
+chart.setAxis(xAxis);
+chart.setAxis(yAxis);
 
 // set the region that the data should draw to
 chart.setCanvasViewPort({
@@ -108,9 +108,9 @@ chart.on('render', (time, deltaTime) => {
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const xScale = chart.getAxise('x').getScale();
-  const zeroY = chart.getAxise('y').d2c(0);
-  const xCanvasViewPort = chart.getAxise('x').getCanvasViewPort();
+  const xScale = chart.getAxis('x').getScale();
+  const zeroY = chart.getAxis('y').d2c(0);
+  const xCanvasViewPort = chart.getAxis('x').getCanvasViewPort();
 
   // draw base line on level y = 0
   ctx.beginPath();

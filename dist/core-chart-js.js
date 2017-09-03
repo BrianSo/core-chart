@@ -1864,12 +1864,12 @@ var CoreChart = function () {
       return result;
     }
   }, {
-    key: 'setAxise',
+    key: 'setAxis',
     value: function setAxise(axis) {
       this.axises[axis.name] = axis;
     }
   }, {
-    key: 'getAxise',
+    key: 'getAxis',
     value: function getAxise(name) {
       return this.axises[name];
     }
@@ -1879,7 +1879,7 @@ var CoreChart = function () {
       delete this.axises[name];
     }
   }, {
-    key: 'getAllAxise',
+    key: 'getAllAxises',
     value: function getAllAxise() {
       var _this2 = this;
 
@@ -1922,7 +1922,7 @@ var CoreChart = function () {
   }, {
     key: 'render',
     value: function render(time, deltaTime) {
-      this.getAllAxise().forEach(function (axis) {
+      this.getAllAxises().forEach(function (axis) {
         axis.settleViewPort();
       });
       this.ee.emit('render', time, deltaTime);

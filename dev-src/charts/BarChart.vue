@@ -17,8 +17,8 @@
       ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
 
       ctx.save();
-      let cvx = this.getAxise('x').getCanvasViewPort();
-      let cvy = this.getAxise('y').getCanvasViewPort();
+      let cvx = this.getAxis('x').getCanvasViewPort();
+      let cvy = this.getAxis('y').getCanvasViewPort();
 
       ctx.beginPath();
       ctx.rect(cvx.min, cvy.min, viewPortLength(cvx), viewPortLength(cvy));
@@ -31,8 +31,8 @@
       ctx.restore();
     }
     renderTicks(ctx, cvx, cvy) {
-      const xAxis = this.getAxise('x');
-      const yAxis = this.getAxise('y');
+      const xAxis = this.getAxis('x');
+      const yAxis = this.getAxis('y');
       const xTicks = xAxis.ticksMax(13).ticks;
       const yTicks = yAxis.ticksMax(8).ticks;
 
@@ -79,7 +79,7 @@
       ctx.strokeStyle = '#f00';
       ctx.fillStyle = "#600";
 
-      const xScale = this.getAxise('x').getScale();
+      const xScale = this.getAxis('x').getScale();
       for(let pt of this.data){
         pt = this.d2c(pt);
 
@@ -97,8 +97,8 @@
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    this.chart.getAxise('x').setCanvasViewPort({min: 10, max: canvas.width-10});
-    this.chart.getAxise('y').setCanvasViewPort({min: 10, max: canvas.height-10});
+    this.chart.getAxis('x').setCanvasViewPort({min: 10, max: canvas.width-10});
+    this.chart.getAxis('y').setCanvasViewPort({min: 10, max: canvas.height-10});
   }
 
   function onResize(){
@@ -118,8 +118,8 @@
       this.chart = new MyChart(this.$refs.canvas);
       const xAxis = new Axis('x');
       const yAxis = new YAxis('y');
-      this.chart.setAxise(xAxis);
-      this.chart.setAxise(yAxis);
+      this.chart.setAxis(xAxis);
+      this.chart.setAxis(yAxis);
 
       updateSize.call(this);
 
