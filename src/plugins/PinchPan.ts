@@ -1,4 +1,4 @@
-import Hammer from 'hammerjs';
+import * as Hammer from 'hammerjs';
 import CoreChart from "../CoreChart";
 
 export interface PinchPanManagerOptions{

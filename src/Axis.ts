@@ -69,14 +69,14 @@ export class Axis{
     this.scroll(diff / viewPortLength(this.canvasViewPort) * viewPortLength(this.viewPort), scrollLimit)
   }
 
-  zoom(scale:number, center:number){
+  zoom(scale:number, center?:number){
     if(typeof center === 'undefined'){
       center = this.c2d((this.canvasViewPort.min + this.canvasViewPort.max) / 2);
     }
     this.viewPort = viewPortZoom(this.viewPort, scale, center);
     this.viewPortChanged();
   }
-  zoomFromCanvasPx(scale:number, centerInCanvasPx:number){
+  zoomFromCanvasPx(scale:number, centerInCanvasPx?:number){
     if(typeof centerInCanvasPx === 'undefined'){
       centerInCanvasPx = (this.canvasViewPort.min + this.canvasViewPort.max) / 2;
     }
@@ -140,7 +140,7 @@ export class Axis{
 
     return this.ticks(Math.pow(2, n));
   }
-  ticks(desiredInterval:number):Ticks{
+  ticks(desiredInterval?:number):Ticks{
     desiredInterval = desiredInterval || 1;
 
     let ticks = [];
@@ -183,8 +183,7 @@ export class Axis{
     }
     return result;
   }
-  findMaxMinValueOfPoints(points:DataPoint[], begin:number, end:number){
-    begin = begin || 0;
+  findMaxMinValueOfPoints(points:DataPoint[], begin:number = 0, end?:number){
     end = end || points.length-1;
 
     let min = Number.POSITIVE_INFINITY;
