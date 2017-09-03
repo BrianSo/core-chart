@@ -1,8 +1,7 @@
 module.exports = function(config) {
   config.set({
-    frameworks: ["jasmine", "karma-typescript"],
+    frameworks: ["jasmine", "karma-typescript", "phantomjs-shim"],
     files: [
-      { pattern: "./node_modules/es6-object-assign/dist/object-assign-auto.js"},
       { pattern: "src/**/*.ts" }, // *.tsx for React Jsx
     ],
     preprocessors: {
