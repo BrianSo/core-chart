@@ -3,6 +3,7 @@ node_js:
   - "6.11.2"
 
 before_script:
+  - npm install phantomjs-prebuilt
   - npm run unit
 
 script:

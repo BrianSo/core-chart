@@ -17,7 +17,7 @@ if (env === 'build') {
 }
 
 const config = {
-  entry: __dirname + '/../src/index.js',
+  entry: __dirname + '/../src/index.ts',
   devtool: 'source-map',
   output: {
     path: __dirname + '/../dist',
@@ -29,6 +29,11 @@ const config = {
   module: {
     rules: [
       {
+        test: /\.tsx?$/,
+        loader: 'ts-loader',
+        exclude: /(node_modules|bower_components)/
+      },
+      {
         test: /(\.jsx|\.js)$/,
         loader: 'babel-loader',
         exclude: /(node_modules|bower_components)/
@@ -37,7 +42,7 @@ const config = {
   },
   resolve: {
     // modules: [path.resolve('../node_modules'), path.resolve('../src')],
-    extensions: ['.json', '.js']
+    extensions: ['.ts', '.json', '.js']
   },
   plugins: plugins
 };

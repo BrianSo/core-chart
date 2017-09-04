@@ -1,5 +1,7 @@
 import EventEmitter from 'wolfy87-eventemitter';
 import {Animation, DurationAnimation} from './Animation';
+import {Axis} from './Axis';
+import {DataPoint, DataValue, Range} from "./util";
 
 const performanceNowOrDateNow = ()=>{
   if(window.performance && window.performance.now){
@@ -8,10 +10,29 @@ const performanceNowOrDateNow = ()=>{
   return Date.now();
 };
 
+export interface ScrollOptions{
+  animated?: boolean;
+  animationDuration?: number;
+  cancelAnimation?: boolean;
+}
+
 export default class CoreChart{
-  constructor(canvas) {
+
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  axises:{
+    [key: string]: Axis
+  };
+  data: DataPoint[];
+  renderId: number;
+  ee: EventEmitter;
+  lastTime: number|null;
+  animations: Animation[];
+
+
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
+    this.ctx = canvas.getContext('2d')!;
     this.axises = {};
     this.data = [];
     this.renderId = -1;
@@ -20,13 +41,12 @@ export default class CoreChart{
     this.animations = [];
   }
 
-  setData(data){
+  setData(data:DataPoint[]){
     this.data = data;
     this.renderInNextFrame();
   }
 
-  scroll(axisDiffs, scrollLimit, options){
-    options = options || {};
+  scroll(axisDiffs:DataValue<number>, scrollLimit:boolean = false, options: ScrollOptions = {}){
     options = Object.assign({
       animated: false,
       animationDuration: 300,
@@ -55,54 +75,54 @@ export default class CoreChart{
       this.renderInNextFrame();
     }
   }
-  scrollInPx(axisDiffs, scrollLimit){
+  scrollInPx(axisDiffs:DataValue<number>, scrollLimit:boolean = false){
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].scrollInPx(axisDiffs[key], scrollLimit);
     }
     this.renderInNextFrame();
   }
-  zoom(axisDiffs, center){
+  zoom(axisDiffs:DataValue<number>, center:DataPoint){
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].zoom(axisDiffs[key], center[key]);
     }
     this.renderInNextFrame();
   }
-  zoomFromCanvasPx(axisDiffs, centerInCanvasPx){
+  zoomFromCanvasPx(axisDiffs:DataValue<number>, centerInCanvasPx:DataPoint){
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].zoomFromCanvasPx(axisDiffs[key], centerInCanvasPx[key]);
     }
     this.renderInNextFrame();
   }
 
-  setCanvasViewPort(axisViewPorts){
+  setCanvasViewPort(axisViewPorts:DataValue<Range>){
     for(const key of Object.keys(axisViewPorts)){
       this.axises[key] && this.axises[key].setCanvasViewPort(axisViewPorts[key]);
     }
     this.renderInNextFrame();
   }
-  setViewPort(axisViewPorts){
+  setViewPort(axisViewPorts:DataValue<Range>){
     for(const key of Object.keys(axisViewPorts)){
       this.axises[key] && this.axises[key].setViewPort(axisViewPorts[key]);
     }
     this.renderInNextFrame();
   }
-  setViewPortLimit(axisViewPorts){
+  setViewPortLimit(axisViewPorts:DataValue<Range>){
     for(const key of Object.keys(axisViewPorts)){
       this.axises[key] && this.axises[key].setViewPortLimit(axisViewPorts[key]);
     }
     this.renderInNextFrame();
   }
 
-  d2c(dataInAxisValue){
-    const result = {};
+  d2c(dataInAxisValue:DataPoint):DataPoint{
+    const result:DataPoint = {};
     for(const key of Object.keys(dataInAxisValue)){
       if(this.axises[key])
         result[key] = this.axises[key].d2c(dataInAxisValue[key]);
     }
     return result;
   }
-  c2d(dataInCanvasValue){
-    const result = {};
+  c2d(dataInCanvasValue:DataPoint):DataPoint{
+    const result:DataPoint = {};
     for(const key of Object.keys(dataInCanvasValue)){
       if(this.axises[key])
         result[key] = this.axises[key].c2d(dataInCanvasValue[key]);
@@ -110,18 +130,18 @@ export default class CoreChart{
     return result;
   }
 
-  setAxis(axis) {
+  setAxis(axis:Axis) {
     this.axises[axis.name] = axis;
   }
 
-  getAxis(name){
+  getAxis(name:string):Axis{
     return this.axises[name];
   }
-  removeAxis(name){
+  removeAxis(name:string){
     delete this.axises[name];
   }
 
-  getAllAxises(){
+  getAllAxises():Axis[]{
     return Object.keys(this.axises).map(name=>this.axises[name]);
   }
 
@@ -143,7 +163,7 @@ export default class CoreChart{
     }
   }
 
-  beforeRender(time, deltaTime){
+  beforeRender(time:number, deltaTime:number){
     this.ee.emit('beforeRender',time, deltaTime);
 
     for(let i = this.animations.length - 1; i >= 0; i--){
@@ -154,37 +174,47 @@ export default class CoreChart{
     }
   }
 
-  render(time, deltaTime){
+  render(time:number, deltaTime:number){
     this.getAllAxises().forEach(axis=>{
       axis.settleViewPort();
     });
     this.ee.emit('render',time, deltaTime);
   }
-  postRender(time, deltaTime){
+  postRender(time:number, deltaTime:number){
     this.ee.emit('postRender',time, deltaTime);
   }
 
 
-  on(event, cb){
-    return this.ee.addListener(event, cb);
-  }
-  addListener(event, cb){
-    return this.ee.addListener(event, cb);
-  }
-  once(event, cb){
-    return this.ee.addOnceListener(event, cb);
-  }
-  addOnceListener(event, cb){
-    return this.ee.addOnceListener(event, cb);
-  }
-  off(event, cb){
-    return this.ee.removeListener(event, cb);
-  }
-  removeListener(event, cb){
-    return this.ee.removeListener(event, cb);
+  on(event:'beforeRender', cb:(time: number, deltaTime: number)=>void):this;
+  on(event:'render', cb:(time: number, deltaTime: number)=>void):this;
+  on(event:'postRender', cb:(time: number, deltaTime: number)=>void):this;
+  on(event:string, cb: Function){
+    this.ee.addListener(event, cb);
+    return this;
   }
 
-  startAnimation(animation){
+  addListener(event:string, cb:Function){
+    this.ee.addListener(event, cb);
+    return this;
+  }
+  once(event:string, cb:Function){
+    this.ee.addOnceListener(event, cb);
+    return this;
+  }
+  addOnceListener(event:string, cb:Function){
+    this.ee.addOnceListener(event, cb);
+    return this;
+  }
+  off(event:string, cb:Function){
+    this.ee.removeListener(event, cb);
+    return this;
+  }
+  removeListener(event:string, cb:Function){
+    this.ee.removeListener(event, cb);
+    return this;
+  }
+
+  startAnimation(animation:Animation){
     this.animations.push(animation);
     animation.onStart(performanceNowOrDateNow());
     this.renderInNextFrame();
