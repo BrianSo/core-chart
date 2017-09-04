@@ -22,8 +22,8 @@ export default class CoreChart {
     setData(data: DataPoint[]): void;
     scroll(axisDiffs: DataValue<number>, scrollLimit?: boolean, options?: ScrollOptions): void;
     scrollInPx(axisDiffs: DataValue<number>, scrollLimit?: boolean): void;
-    zoom(axisDiffs: DataValue<number>, center: DataPoint): void;
-    zoomFromCanvasPx(axisDiffs: DataValue<number>, centerInCanvasPx: DataPoint): void;
+    zoom(axisDiffs: DataValue<number>, center?: DataPoint): void;
+    zoomFromCanvasPx(axisDiffs: DataValue<number>, centerInCanvasPx?: DataPoint): void;
     setCanvasViewPort(axisViewPorts: DataValue<Range>): void;
     setViewPort(axisViewPorts: DataValue<Range>): void;
     setViewPortLimit(axisViewPorts: DataValue<Range>): void;

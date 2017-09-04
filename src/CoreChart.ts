@@ -81,13 +81,15 @@ export default class CoreChart{
     }
     this.renderInNextFrame();
   }
-  zoom(axisDiffs:DataValue<number>, center:DataPoint){
+  zoom(axisDiffs:DataValue<number>, center?:DataPoint){
+    center = center || {};
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].zoom(axisDiffs[key], center[key]);
     }
     this.renderInNextFrame();
   }
-  zoomFromCanvasPx(axisDiffs:DataValue<number>, centerInCanvasPx:DataPoint){
+  zoomFromCanvasPx(axisDiffs:DataValue<number>, centerInCanvasPx?:DataPoint){
+    centerInCanvasPx = centerInCanvasPx || {};
     for(const key of Object.keys(axisDiffs)){
       this.axises[key] && this.axises[key].zoomFromCanvasPx(axisDiffs[key], centerInCanvasPx[key]);
     }

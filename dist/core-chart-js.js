@@ -504,6 +504,7 @@ var CoreChart = /** @class */ (function () {
         this.renderInNextFrame();
     };
     CoreChart.prototype.zoom = function (axisDiffs, center) {
+        center = center || {};
         for (var _i = 0, _a = Object.keys(axisDiffs); _i < _a.length; _i++) {
             var key = _a[_i];
             this.axises[key] && this.axises[key].zoom(axisDiffs[key], center[key]);
@@ -511,6 +512,7 @@ var CoreChart = /** @class */ (function () {
         this.renderInNextFrame();
     };
     CoreChart.prototype.zoomFromCanvasPx = function (axisDiffs, centerInCanvasPx) {
+        centerInCanvasPx = centerInCanvasPx || {};
         for (var _i = 0, _a = Object.keys(axisDiffs); _i < _a.length; _i++) {
             var key = _a[_i];
             this.axises[key] && this.axises[key].zoomFromCanvasPx(axisDiffs[key], centerInCanvasPx[key]);
