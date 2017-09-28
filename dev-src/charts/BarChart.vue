@@ -14,8 +14,10 @@
     canvas.width = canvas.clientWidth;
     canvas.height = canvas.clientHeight;
 
-    this.chart.getAxis('x').setCanvasViewPort({min: 10, max: canvas.width-10});
-    this.chart.getAxis('y').setCanvasViewPort({min: 10, max: canvas.height-10});
+    this.chart.setCanvasViewPort({
+      x: { min: 10, max: canvas.width-10 },
+      y: { min: 10, max: canvas.height-10 }
+    });
   }
 
   function onResize(){
@@ -36,10 +38,8 @@
       let renderer = new BarChartRenderer(this.chart);
       this.chart.on('render', (time, deltaTime)=>renderer.render(time, deltaTime));
 
-      const xAxis = new Axis('x');
-      const yAxis = new YAxis('y');
-      this.chart.setAxis(xAxis);
-      this.chart.setAxis(yAxis);
+      this.chart.setAxis(new Axis('x'));
+      this.chart.setAxis(new YAxis('y'));
 
       updateSize.call(this);
 
@@ -50,17 +50,15 @@
         {x: 9, y: 3},
         {x: 10, y: 6}
       ]);
-      xAxis.setViewPort({
-        min: 3, max: 10
+
+      this.chart.setViewPortLimit({
+        x: { min: 1, max: 12 },
+        y: { min: 0, max: 10 }
       });
-      yAxis.setViewPort({
-        min: 1, max: 9
-      });
-      xAxis.setViewPortLimit({
-        min: 1, max: 12
-      });
-      yAxis.setViewPortLimit({
-        min: 0, max: 10
+
+      this.chart.setViewPort({
+        x: { min: 3, max: 10 },
+        y: { min: 1, max: 9 }
       });
 
       // Events
