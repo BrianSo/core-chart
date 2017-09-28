@@ -7,90 +7,7 @@
 <script>
   import PinchPanManager from '../../src/plugins/PinchPan';
   import {CoreChart, Axis, YAxis} from '../../src';
-  import {viewPortLength} from '../../src/util';
-
-  class MyChart extends CoreChart{
-    render(){
-      super.render();
-      const ctx = this.ctx;
-
-      ctx.clearRect(0,0,this.canvas.width, this.canvas.height);
-
-      ctx.save();
-      let cvx = this.getAxis('x').getCanvasViewPort();
-      let cvy = this.getAxis('y').getCanvasViewPort();
-
-      ctx.beginPath();
-      ctx.rect(cvx.min, cvy.min, viewPortLength(cvx), viewPortLength(cvy));
-      ctx.stroke();
-      ctx.clip();
-      ctx.closePath();
-
-      this.renderTicks(ctx, cvx, cvy);
-      this.renderBar(ctx, cvx, cvy);
-      ctx.restore();
-    }
-    renderTicks(ctx, cvx, cvy) {
-      const xAxis = this.getAxis('x');
-      const yAxis = this.getAxis('y');
-      const xTicks = xAxis.ticksMax(13).ticks;
-      const yTicks = yAxis.ticksMax(8).ticks;
-
-      ctx.save();
-
-      ctx.setLineDash([5,3]);
-      ctx.strokeStyle = '#999';
-      ctx.lineWidth = 1;
-
-//      const xDashLine = 8 * xAxis.getScale();
-//      ctx.lineDashOffset = (xAxis.getViewPort().min % xDashLine)/xAxis.getScale();
-
-      for(const t of xTicks){
-        ctx.beginPath();
-
-        let x = xAxis.d2c(t);
-        ctx.lineTo(x, cvy.min);
-        ctx.lineTo(x, cvy.max);
-        ctx.stroke();
-        ctx.closePath();
-
-        let text = ctx.measureText(String(t));
-        ctx.fillText(String(t), x - text.width/2, cvy.max - 2);
-      }
-
-//      const yDashLine = 8 * yAxis.getScale();
-//      ctx.lineDashOffset = (yAxis.getViewPort().min % yDashLine)/yAxis.getScale();
-
-      for(const t of yTicks){
-        ctx.beginPath();
-
-        let y = yAxis.d2c(t);
-        ctx.lineTo(cvx.min, y);
-        ctx.lineTo(cvx.max, y);
-        ctx.stroke();
-        ctx.closePath();
-
-        ctx.fillText(String(t), cvx.min + 2, y - 2);
-      }
-      ctx.restore();
-    }
-    renderBar(ctx, cvx, cvy){
-
-      ctx.strokeStyle = '#f00';
-      ctx.fillStyle = "#600";
-
-      const xScale = this.getAxis('x').getScale();
-      for(let pt of this.data){
-        pt = this.d2c(pt);
-
-        const width = 1 * xScale;
-        const height = cvy.max - pt.y;
-
-        ctx.fillRect(pt.x - width/2, pt.y, width, height);
-      }
-    }
-  }
-
+  import {BarChartRenderer} from './BarChart-renderer';
 
   function updateSize(){
     const canvas = this.$refs.canvas;
@@ -115,7 +32,10 @@
     },
     computed: {},
     mounted() {
-      this.chart = new MyChart(this.$refs.canvas);
+      this.chart = new CoreChart(this.$refs.canvas);
+      let renderer = new BarChartRenderer(this.chart);
+      this.chart.on('render', (time, deltaTime)=>renderer.render(time, deltaTime));
+
       const xAxis = new Axis('x');
       const yAxis = new YAxis('y');
       this.chart.setAxis(xAxis);
