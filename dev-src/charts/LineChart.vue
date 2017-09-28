@@ -9,29 +9,44 @@
   import PinchPanManager from '../../src/plugins/PinchPan';
   import {CoreChart, Axis, YAxis, util} from '../../src';
   import {LineChartRenderer} from "./LineChart-renderer";
-  const {viewPortLength} = util;
 
-  function updateSize(){
-    const canvas = this.$refs.canvas;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-
-    this.chart.setCanvasViewPort({
-      x: { min: 10, max: canvas.width-10 },
-      y: { min: 10, max: canvas.height-10 }
+  const generateData = ()=>{
+    let data = [];
+    let max = 0;
+    data.push({
+      x:0,
+      y:5
     });
-  }
+    for(let i = 1; i < 1000; i++){
+      let y = data[i-1].y *  (0.8 + Math.random() * 0.41);
+      if(y>max)max = y;
+      data.push({
+        x:i,
+        y:y
+      });
+    }
+    return {data, max};
+  };
+  const simulateRealTimeData = (data, chart)=>{
+    let x = data[data.length-1].x;
+    setInterval(()=>{
+      let y = data[data.length - 1].y *  (0.8 + Math.random() * 0.41);
 
-  function onResize(){
-    updateSize.call(this);
-    this.chart.render();
-  }
+      data.shift();
+      data.push({
+        x:x++,
+        y:y
+      });
+
+      chart.scroll({x:1}, true, {animated: true});
+      chart.renderInNextFrame();
+    },1000);
+  };
 
   export default {
     data() {
       return {
         chart: null,
-        resizeListener: null,
         shouldRenderPreview: false,
       }
     },
@@ -49,37 +64,12 @@
       this.chart.setAxis(new Axis('x'));
       this.chart.setAxis(new YAxis('y'));
 
-      updateSize.call(this);
+      this.updateSize();
 
-      let data = [];
-      let max = 0;
+      let {data, max} = generateData();
 
-      data.push({
-        x:0,
-        y:5
-      });
-      let i = 1;
-      for(; i < 1000; i++){
-        let y = data[i-1].y *  (0.8 + Math.random() * 0.41);
-        if(y>max)max = y;
-        data.push({
-          x:i,
-          y:y
-        });
-      }
-
-      setInterval(()=>{
-        data.shift();
-        let y = data[data.length - 1].y *  (0.8 + Math.random() * 0.41);
-        if(y>max)max = y;
-        data.push({
-          x:i++,
-          y:y
-        });
-
-        this.chart.scroll({x:1}, true, {animated: true});
-        this.chart.renderInNextFrame();
-      },1000);
+      // simulate receiving real time data and scroll the chart
+      simulateRealTimeData(data, this.chart);
 
       this.chart.setData(data);
 
@@ -108,15 +98,29 @@
         this.chart.setViewPortLimit({y:{min,max}});
         this.chart.setViewPort({y:{min,max}});
       });
-      this.resizeListener = onResize.bind(this);
-      window.addEventListener('resize', this.resizeListener, false);
+      window.addEventListener('resize', this.onResize, false);
 
       new PinchPanManager(this.$refs.canvas, this.chart);
     },
     beforeDestroy(){
-      this.resizeListener && window.removeEventListener('resize', this.resizeListener);
+      window.removeEventListener('resize', this.onResize);
     },
-    methods: {},
+    methods: {
+      updateSize(){
+        const canvas = this.$refs.canvas;
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
+        this.chart.setCanvasViewPort({
+          x: { min: 10, max: canvas.width-10 },
+          y: { min: 10, max: canvas.height-10 }
+        });
+      },
+      onResize(){
+        this.updateSize();
+        this.chart.render();
+      }
+    },
     props: {},
     components: {}
   }

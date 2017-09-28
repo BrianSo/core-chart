@@ -9,27 +9,10 @@
   import {CoreChart, Axis, YAxis} from '../../src';
   import {BarChartRenderer} from './BarChart-renderer';
 
-  function updateSize(){
-    const canvas = this.$refs.canvas;
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-
-    this.chart.setCanvasViewPort({
-      x: { min: 10, max: canvas.width-10 },
-      y: { min: 10, max: canvas.height-10 }
-    });
-  }
-
-  function onResize(){
-    updateSize.call(this);
-    this.chart.render();
-  }
-
   export default {
     data() {
       return {
-        chart: null,
-        resizeListener: null
+        chart: null
       }
     },
     computed: {},
@@ -41,7 +24,7 @@
       this.chart.setAxis(new Axis('x'));
       this.chart.setAxis(new YAxis('y'));
 
-      updateSize.call(this);
+      this.updateSize();
 
       this.chart.setData([
         {x: 3, y: 2},
@@ -62,15 +45,30 @@
       });
 
       // Events
-      this.resizeListener = onResize.bind(this);
-      window.addEventListener('resize', this.resizeListener, false);
+      window.addEventListener('resize', this.onResize, false);
 
       new PinchPanManager(this.$refs.canvas, this.chart);
     },
     beforeDestroy(){
-      this.resizeListener && window.removeEventListener('resize', this.resizeListener);
+      console.log('beforeDestroy');
+      window.removeEventListener('resize', this.onResize);
     },
-    methods: {},
+    methods: {
+      updateSize(){
+        const canvas = this.$refs.canvas;
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+
+        this.chart.setCanvasViewPort({
+          x: { min: 10, max: canvas.width-10 },
+          y: { min: 10, max: canvas.height-10 }
+        });
+      },
+      onResize(){
+        this.updateSize();
+        this.chart.render();
+      }
+    },
     props: {},
     components: {}
   }
