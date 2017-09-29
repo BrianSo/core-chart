@@ -12,6 +12,11 @@ const performanceNowOrDateNow = ()=>{
 
 export type CoreChartEvent = 'beforeRender' | 'render' | 'postRender';
 
+export interface CoreChartPlugin{
+  name: string,
+  install(chart: CoreChart):void;
+}
+
 export interface ScrollOptions{
   animated?: boolean;
   animationDuration?: number;
@@ -31,6 +36,9 @@ export default class CoreChart{
   private ee: EventEmitter;
   private lastTime: number|null;
   private animations: Animation[];
+  plugins: {
+    [key: string]: CoreChartPlugin
+  };
 
 
   constructor(canvas: HTMLCanvasElement) {
@@ -45,6 +53,13 @@ export default class CoreChart{
     this.ee = new EventEmitter();
     this.lastTime = null;
     this.animations = [];
+    this.plugins = {};
+  }
+
+  installPlugin(plugin: CoreChartPlugin): this{
+    this.plugins[plugin.name] = plugin;
+    plugin.install(this);
+    return this;
   }
 
   setData(data:DataPoint[]){

@@ -6,9 +6,11 @@
 </template>
 
 <script>
-  import PinchPanManager from '../../src/plugins/PinchPan';
-  import {CoreChart, Axis, YAxis, util} from '../../src';
+  import Vue from 'vue';
+  import {CoreChart, Axis, YAxis, util, Plugins} from '../../src';
+  const {PinchPanManager, ClickManager} = Plugins;
   import {LineChartRenderer} from "./LineChart-renderer";
+  import {CircleFunction} from "../../src/plugins/ClickCollision";
 
   const generateData = ()=>{
     let data = [];
@@ -97,7 +99,24 @@
       });
       window.addEventListener('resize', this.onResize, false);
 
-      new PinchPanManager(this.$refs.canvas, this.chart);
+      this.chart.installPlugin(new PinchPanManager());
+      this.chart.installPlugin(new Plugins.ClickManager({
+        createClickableArea:(circle)=>{
+          const xAxis = this.chart.getAxis('x');
+          let {min, max} = xAxis.findRenderingRangeOfPoints(this.chart.data);
+
+          for(let i = min; i <= max; i++){
+            const pt = this.chart.data[i];
+            const canvasPoint = this.chart.d2c(pt);
+            circle(canvasPoint, 10, pt);
+          }
+        },
+        onClick(data){
+          console.log(data);
+          data.y = data.y * (0.9 + 0.2 * Math.random())
+          Vue.set(data, 'selected', true);
+        }
+      }));
     },
     beforeDestroy(){
       window.removeEventListener('resize', this.onResize);

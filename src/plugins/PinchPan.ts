@@ -1,25 +1,26 @@
 import * as Hammer from 'hammerjs';
-import CoreChart from "../CoreChart";
+import CoreChart, {CoreChartPlugin} from "../CoreChart";
 
 export interface PinchPanManagerOptions{
-  x?: string; // the name of the x axis
-  y?: string; // the name of the y axis
   drag?: number
 }
 
-export default class PinchPanManager{
+export default class PinchPanManager implements CoreChartPlugin{
 
+  name = 'PinchPanManager';
   chart: CoreChart;
+  options: PinchPanManagerOptions;
 
-  constructor(canvas: HTMLCanvasElement, chart: CoreChart, options: PinchPanManagerOptions = {}){
-    options = Object.assign({
-      x: 'x',
-      y: 'y',
+  constructor(options: PinchPanManagerOptions = {}){
+    this.options = Object.assign({
       drag: 2,
     },options);
+  }
 
+  install(chart: CoreChart): void {
     this.chart = chart;
-    const mc = new Hammer.Manager(canvas);
+
+    const mc = new Hammer.Manager(chart.canvas);
 
     const pinch = new Hammer.Pinch();
     const pan = new Hammer.Pan();
@@ -50,16 +51,16 @@ export default class PinchPanManager{
         // just finger down
 
         this.chart.scrollInPx({
-          [options.x!]:-ev.deltaX,
-          [options.y!]:ev.deltaY
+          x:-ev.deltaX,
+          y:ev.deltaY
         });
 
       }else{
         // scroll by the distance between last frame
 
         this.chart.scrollInPx({
-          [options.x!]:-(ev.center.x - lastEvent.center.x),
-          [options.y!]:(ev.center.y - lastEvent.center.y)
+          x:-(ev.center.x - lastEvent.center.x),
+          y:(ev.center.y - lastEvent.center.y)
         });
 
         if(ev.pointers.length > 1){
@@ -76,11 +77,11 @@ export default class PinchPanManager{
             const scaleX = Math.abs(thisDistanceX) < 100 ? 1 : Math.abs(lastDistanceX/thisDistanceX);
             const scaleY = Math.abs(thisDistanceY) < 100 ? 1 : Math.abs(lastDistanceY/thisDistanceY);
             this.chart.zoomFromCanvasPx({
-              [options.x!]:scaleX,
-              [options.y!]:scaleY
+              x:scaleX,
+              y:scaleY
             }, {
-              [options.x!]:ev.center.x,
-              [options.y!]:ev.center.y
+              x:ev.center.x,
+              y:ev.center.y
             });
           }
           lastPointers = ev.pointers;
@@ -109,7 +110,7 @@ export default class PinchPanManager{
 
           // update velocity
           if(deltaTime > 0){
-            let decrease = options.drag! * deltaTime;
+            let decrease = this.options.drag! * deltaTime;
             if(decrease > 1)
               decrease = 1;
             lastVelocity *= 1 - decrease;

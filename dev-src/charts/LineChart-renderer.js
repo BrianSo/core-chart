@@ -25,7 +25,7 @@ export class LineChartRenderer{
     this.renderLine(ctx, cvx, cvy);
     if(shouldRenderPreview)
       this.renderPreview(ctx, cvx, cvy);
-//      this.renderMaker(ctx, cvx, cvy);
+    this.renderMaker(ctx, cvx, cvy);
     ctx.restore();
   }
 
@@ -152,6 +152,9 @@ export class LineChartRenderer{
     ctx.strokeStyle = '#f00';
     ctx.fillStyle = "#600";
     for (let pt of this.chart.data) {
+      if(!pt.selected){
+        continue;
+      }
       pt = this.chart.d2c(pt);
       ctx.fillRect(pt.x - 2, pt.y - 2, 4, 4);
     }
