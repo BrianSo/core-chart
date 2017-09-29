@@ -26,6 +26,11 @@ Note: If you just have complex requirement, you may consider Chart.js + plugins,
 however, at the time when I create this project, i didn't see much documentation
 of how to write a chart.js plugin.
 
+## Why Not Core Chart?
+
+1. Need to write the rendering by your own, however we provide
+2. Need more code to config a simple feature comparing to other charting library
+
 ## We offer you
 
 The library offers you the base classes to create charts and sample codes to
@@ -129,30 +134,46 @@ chart.on('render', (time, deltaTime) => {
 
 ## Getting started
 
-Concepts:  
-1. Data space: the raw value of the data
-2. Canvas space: the projection result
-3. d2c, c2d: the conversion from data space to canvas space and vice versa.
+Concepts:
+1. Data space vs Canvas space  
+  Data space is the space that the data originally in. 
+  The data will transform to Canvas space by calling c2d() in order display properly in the canvas.
+  We also provide d2c() to transform data from canvas space to data space
+2. Rendering vs Chart Control  
+  We recommend writing your rendering and controlling code in separate files. 
+  Rendering is an idempotent function that display your data only.
+  You will probably write your rendering like this
+  ```
+  chart.on('render', (time, deltaTime) => MyRenderer.render(time, deltaTime, chart.data));
+  ```
 
-Core Classes and methods:
+Core Classes and methods you should look at:
 1. CoreChart
   - setViewPort()
+  - setViewPortLimit()
+  - getAxis()
   - scroll()
   - zoom()
+  - on('beforeRender'), on('render'), on('postRender') hooks
+  - d2c(): transform a point from data space to canvas space
+  - c2d(): transform a point from canvas space to data space
 2. Axis
   - d2c(): transform a value from data space to canvas space
   - c2d(): transform a value from canvas space to data space
   - ticks(): find the ticks that should be rendered
+
 3. Animation (optional)
+```
+chart.startAnimation(new DurationAnimation({
+  duration: options.animationDuration,
+  onUpdate:(deltaTime, time, progress, deltaProgress)=>{
+    // update the value here
+    this.invalidate();
+  }
+}));
+```
 
-## APIs
-### CoreChart
-The chart controller.
-
-### Axis
-The axis of the chart. 
-
-### Examples
+## Examples
 see `dev-src/charts`
 
 ## Contributing
@@ -169,7 +190,14 @@ npm run unit-dev
 
 # run all tests
 npm test
+
+# build
+npm run build
 ```
+
+Welcome PR for the bug fixes, proposal.  
+
+We also accept Plugins and Renderer PR in current stage.
 
 ## TODO
 1. write documentation
