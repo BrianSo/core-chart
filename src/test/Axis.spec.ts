@@ -5,7 +5,7 @@ describe('Axis', ()=>{
 
   describe('space mapping', ()=>{
     it('should translate the axis value to canvas value', ()=>{
-      const axis = new Axis('whatever');
+      const axis = new Axis('x');
 
       axis.setCanvasViewPort({min: 0, max: 10});
       axis.setViewPort({min: 0, max: 10});
@@ -29,7 +29,7 @@ describe('Axis', ()=>{
     });
 
     it('c2d and d2c should be the inverse function of each other', ()=>{
-      const axis = new Axis('whatever');
+      const axis = new Axis('x');
 
       axis.setCanvasViewPort({min: 3, max: 10});
       axis.setViewPort({min: 7, max: 12});
@@ -53,7 +53,7 @@ describe('Axis', ()=>{
   describe('ViewPort',()=>{
     describe('should limit the view port within the limit', ()=>{
       let axis: Axis;
-      beforeEach(()=>axis = new Axis('whatever'));
+      beforeEach(()=>axis = new Axis('x'));
 
       it('inside the bound', ()=>{
         axis.setViewPort({min: 0, max: 5});
@@ -101,7 +101,7 @@ describe('Axis', ()=>{
 
     describe('scrolling', ()=>{
       let axis: Axis;
-      beforeEach(()=>axis = new Axis('whatever'));
+      beforeEach(()=>axis = new Axis('x'));
 
       it('scroll without limit',()=>{
         axis.setViewPort({min: 0, max: 5});
@@ -160,7 +160,7 @@ describe('Axis', ()=>{
 
     describe('zooming', ()=>{
       let axis: Axis;
-      beforeEach(()=>axis = new Axis('whatever'));
+      beforeEach(()=>axis = new Axis('x'));
 
       it('zoom',()=>{
         axis.setViewPort({min: 0, max: 5});
@@ -209,8 +209,8 @@ describe('Axis', ()=>{
   describe('find the range of the viewable points', ()=>{
     let axis: Axis, points: DataPoint[];
     beforeEach(()=>{
-      axis = new Axis('axisName');
-      points = [1,2,3.3,4,6,6.5,7,7.1,8,9,10].map(axisName=>({axisName}))
+      axis = new Axis('x');
+      points = [1,2,3.3,4,6,6.5,7,7.1,8,9,10].map(value=>({x: value, y:0}))
     });
 
     it('includes all',()=>{
@@ -234,8 +234,8 @@ describe('Axis', ()=>{
   });
 
   it('find the min max value of the points', ()=>{
-    const axis = new Axis('axisName');
-    const points = [1,6,3.3,3,-6,6.6,7,7.1,20,9,10].map(axisName=>({axisName}));
+    const axis = new Axis('x');
+    const points = [1,6,3.3,3,-6,6.6,7,7.1,20,9,10].map(value=>({x:value, y:0}));
 
     expect(axis.findMaxMinValueOfPoints(points)).toEqual({min:-6, max:20});
     expect(axis.findMaxMinValueOfPoints(points,1,4)).toEqual({min:-6,max:6});
@@ -243,7 +243,7 @@ describe('Axis', ()=>{
 
   describe('Ticks', ()=>{
     it('find ticks at a desired interval', ()=>{
-      const axis = new Axis('whatever');
+      const axis = new Axis('x');
       axis.setViewPort({min: 0, max: 100});
       expect(axis.ticks(20).ticks).toEqual([0,20,40,60,80,100]);
       expect(axis.ticks(20).interval).toBe(20);
@@ -260,7 +260,7 @@ describe('Axis', ()=>{
     });
 
     it('find a number of ticks', ()=>{
-      const axis = new Axis('whatever');
+      const axis = new Axis('x');
       axis.setViewPort({min: 0, max: 10});
 
       expect(axis.ticksMax(6).ticks).toEqual([0,2,4,6,8,10]);
@@ -281,7 +281,7 @@ describe('YAxis', ()=>{
 
   describe('space mapping', ()=> {
     it('should translate the axis value to canvas value', () => {
-      const axis = new YAxis('whatever');
+      const axis = new YAxis();
 
       axis.setCanvasViewPort({min: 0, max: 10});
       axis.setViewPort({min: 0, max: 10});
@@ -305,7 +305,7 @@ describe('YAxis', ()=>{
     });
 
     it('c2d and d2c should be the inverse function of each other', () => {
-      const axis = new YAxis('whatever');
+      const axis = new YAxis();
 
       axis.setCanvasViewPort({min: 3, max: 10});
       axis.setViewPort({min: 7, max: 12});

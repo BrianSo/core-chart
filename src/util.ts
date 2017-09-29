@@ -1,9 +1,13 @@
 
 export interface DataValue<T>{
-  [key: string]: T;
+  x?: T;
+  y?: T;
 }
 
-export type DataPoint = DataValue<number>;
+export interface DataPoint{
+  x: number,
+  y: number
+}
 
 export interface Range{
   min: number,

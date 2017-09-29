@@ -4,16 +4,17 @@ export interface Ticks{
   ticks: number[],
   interval: number
 }
+export type AxisName = 'x' | 'y';
 
 export class Axis{
 
-  name: string;
+  name: AxisName;
   viewPort: Range;
   viewPortLimit: Range;
   canvasViewPort: Range;
   shouldUpdateViewPort = false;
 
-  constructor(name:string){
+  constructor(name:'x' | 'y'){
     this.name = name;
     this.viewPort = {
       min: 0,
@@ -224,8 +225,15 @@ export class Axis{
     return {index: currentIndex, value:currentElement};
   }
 }
-
+export class XAxis extends Axis{
+  constructor(){
+    super('x');
+  }
+}
 export class YAxis extends Axis{
+  constructor(){
+    super('y');
+  }
   d2c(axisValue:number):number{
     let value = super.d2c(axisValue);
     return this.canvasViewPort.min + this.canvasViewPort.max - value;

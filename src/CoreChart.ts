@@ -1,6 +1,6 @@
 import EventEmitter from 'wolfy87-eventemitter';
 import {Animation, DurationAnimation} from './Animation';
-import {Axis} from './Axis';
+import {Axis, AxisName, XAxis, YAxis} from './Axis';
 import {DataPoint, DataValue, Range} from "./util";
 
 const performanceNowOrDateNow = ()=>{
@@ -9,6 +9,8 @@ const performanceNowOrDateNow = ()=>{
   }
   return Date.now();
 };
+
+export type CoreChartEvent = 'beforeRender' | 'render' | 'postRender';
 
 export interface ScrollOptions{
   animated?: boolean;
@@ -21,19 +23,23 @@ export default class CoreChart{
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
   axises:{
-    [key: string]: Axis
+    x: Axis,
+    y: Axis
   };
   data: DataPoint[];
-  renderId: number;
-  ee: EventEmitter;
-  lastTime: number|null;
-  animations: Animation[];
+  private renderId: number;
+  private ee: EventEmitter;
+  private lastTime: number|null;
+  private animations: Animation[];
 
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
-    this.axises = {};
+    this.axises = {
+      x: new XAxis(),
+      y: new YAxis(),
+    };
     this.data = [];
     this.renderId = -1;
     this.ee = new EventEmitter();
@@ -61,90 +67,67 @@ export default class CoreChart{
       this.startAnimation(new DurationAnimation({
         duration: options.animationDuration,
         onUpdate:(deltaTime, time, progress, deltaProgress)=>{
-          for(const key of Object.keys(axisDiffs)){
-            this.axises[key] && this.axises[key].scroll(axisDiffs[key] * deltaProgress, scrollLimit);
-          }
+          axisDiffs.x && this.axises.x.scroll(axisDiffs.x * deltaProgress, scrollLimit);
+          axisDiffs.y && this.axises.y.scroll(axisDiffs.y * deltaProgress, scrollLimit);
           this.renderInNextFrame();
         }
       }));
     }else{
 
-      for(const key of Object.keys(axisDiffs)){
-        this.axises[key] && this.axises[key].scroll(axisDiffs[key], scrollLimit);
-      }
+      axisDiffs.x && this.axises.x.scroll(axisDiffs.x, scrollLimit);
+      axisDiffs.y && this.axises.y.scroll(axisDiffs.y, scrollLimit);
       this.renderInNextFrame();
     }
   }
   scrollInPx(axisDiffs:DataValue<number>, scrollLimit:boolean = false){
-    for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].scrollInPx(axisDiffs[key], scrollLimit);
-    }
+    axisDiffs.x && this.axises.x.scrollInPx(axisDiffs.x, scrollLimit);
+    axisDiffs.y && this.axises.y.scrollInPx(axisDiffs.y, scrollLimit);
     this.renderInNextFrame();
   }
-  zoom(axisDiffs:DataValue<number>, center?:DataPoint){
+  zoom(axisDiffs:DataValue<number>, center?:DataValue<number>){
     center = center || {};
-    for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].zoom(axisDiffs[key], center[key]);
-    }
+    axisDiffs.x && this.axises.x.zoom(axisDiffs.x, center.x);
+    axisDiffs.y && this.axises.y.zoom(axisDiffs.y, center.y);
     this.renderInNextFrame();
   }
-  zoomFromCanvasPx(axisDiffs:DataValue<number>, centerInCanvasPx?:DataPoint){
+  zoomFromCanvasPx(axisDiffs:DataValue<number>, centerInCanvasPx?:DataValue<number>){
     centerInCanvasPx = centerInCanvasPx || {};
-    for(const key of Object.keys(axisDiffs)){
-      this.axises[key] && this.axises[key].zoomFromCanvasPx(axisDiffs[key], centerInCanvasPx[key]);
-    }
+    axisDiffs.x && this.axises.x.zoomFromCanvasPx(axisDiffs.x, centerInCanvasPx.x);
+    axisDiffs.y && this.axises.y.zoomFromCanvasPx(axisDiffs.y, centerInCanvasPx.y);
     this.renderInNextFrame();
   }
 
   setCanvasViewPort(axisViewPorts:DataValue<Range>){
-    for(const key of Object.keys(axisViewPorts)){
-      this.axises[key] && this.axises[key].setCanvasViewPort(axisViewPorts[key]);
-    }
+    axisViewPorts.x && this.axises.x.setCanvasViewPort(axisViewPorts.x);
+    axisViewPorts.y && this.axises.y.setCanvasViewPort(axisViewPorts.y);
     this.renderInNextFrame();
   }
   setViewPort(axisViewPorts:DataValue<Range>){
-    for(const key of Object.keys(axisViewPorts)){
-      this.axises[key] && this.axises[key].setViewPort(axisViewPorts[key]);
-    }
+    axisViewPorts.x && this.axises.x.setViewPort(axisViewPorts.x);
+    axisViewPorts.y && this.axises.y.setViewPort(axisViewPorts.y);
     this.renderInNextFrame();
   }
   setViewPortLimit(axisViewPorts:DataValue<Range>){
-    for(const key of Object.keys(axisViewPorts)){
-      this.axises[key] && this.axises[key].setViewPortLimit(axisViewPorts[key]);
-    }
+    axisViewPorts.x && this.axises.x.setViewPortLimit(axisViewPorts.x);
+    axisViewPorts.y && this.axises.y.setViewPortLimit(axisViewPorts.y);
     this.renderInNextFrame();
   }
 
   d2c(dataInAxisValue:DataPoint):DataPoint{
-    const result:DataPoint = {};
-    for(const key of Object.keys(dataInAxisValue)){
-      if(this.axises[key])
-        result[key] = this.axises[key].d2c(dataInAxisValue[key]);
-    }
-    return result;
+    return {
+      x: this.axises.x.d2c(dataInAxisValue.x),
+      y: this.axises.y.d2c(dataInAxisValue.y),
+    };
   }
   c2d(dataInCanvasValue:DataPoint):DataPoint{
-    const result:DataPoint = {};
-    for(const key of Object.keys(dataInCanvasValue)){
-      if(this.axises[key])
-        result[key] = this.axises[key].c2d(dataInCanvasValue[key]);
-    }
-    return result;
+    return {
+      x: this.axises.x.c2d(dataInCanvasValue.x),
+      y: this.axises.y.c2d(dataInCanvasValue.y),
+    };
   }
 
-  setAxis(axis:Axis) {
-    this.axises[axis.name] = axis;
-  }
-
-  getAxis(name:string):Axis{
+  getAxis(name:AxisName):Axis{
     return this.axises[name];
-  }
-  removeAxis(name:string){
-    delete this.axises[name];
-  }
-
-  getAllAxises():Axis[]{
-    return Object.keys(this.axises).map(name=>this.axises[name]);
   }
 
   renderInNextFrame(){
@@ -177,20 +160,18 @@ export default class CoreChart{
   }
 
   render(time:number, deltaTime:number){
-    this.getAllAxises().forEach(axis=>{
-      axis.settleViewPort();
-    });
+    this.axises.x.settleViewPort();
+    this.axises.y.settleViewPort();
     this.ee.emit('render',time, deltaTime);
   }
   postRender(time:number, deltaTime:number){
     this.ee.emit('postRender',time, deltaTime);
   }
 
-
   on(event:'beforeRender', cb:(time: number, deltaTime: number)=>void):this;
   on(event:'render', cb:(time: number, deltaTime: number)=>void):this;
   on(event:'postRender', cb:(time: number, deltaTime: number)=>void):this;
-  on(event:string, cb: Function){
+  on(event:CoreChartEvent, cb: Function){
     this.ee.addListener(event, cb);
     return this;
   }
