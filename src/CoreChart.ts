@@ -49,7 +49,7 @@ export default class CoreChart{
 
   setData(data:DataPoint[]){
     this.data = data;
-    this.renderInNextFrame();
+    this.invalidate();
   }
 
   scroll(axisDiffs:DataValue<number>, scrollLimit:boolean = false, options: ScrollOptions = {}){
@@ -69,48 +69,48 @@ export default class CoreChart{
         onUpdate:(deltaTime, time, progress, deltaProgress)=>{
           axisDiffs.x && this.axises.x.scroll(axisDiffs.x * deltaProgress, scrollLimit);
           axisDiffs.y && this.axises.y.scroll(axisDiffs.y * deltaProgress, scrollLimit);
-          this.renderInNextFrame();
+          this.invalidate();
         }
       }));
     }else{
 
       axisDiffs.x && this.axises.x.scroll(axisDiffs.x, scrollLimit);
       axisDiffs.y && this.axises.y.scroll(axisDiffs.y, scrollLimit);
-      this.renderInNextFrame();
+      this.invalidate();
     }
   }
   scrollInPx(axisDiffs:DataValue<number>, scrollLimit:boolean = false){
     axisDiffs.x && this.axises.x.scrollInPx(axisDiffs.x, scrollLimit);
     axisDiffs.y && this.axises.y.scrollInPx(axisDiffs.y, scrollLimit);
-    this.renderInNextFrame();
+    this.invalidate();
   }
   zoom(axisDiffs:DataValue<number>, center?:DataValue<number>){
     center = center || {};
     axisDiffs.x && this.axises.x.zoom(axisDiffs.x, center.x);
     axisDiffs.y && this.axises.y.zoom(axisDiffs.y, center.y);
-    this.renderInNextFrame();
+    this.invalidate();
   }
   zoomFromCanvasPx(axisDiffs:DataValue<number>, centerInCanvasPx?:DataValue<number>){
     centerInCanvasPx = centerInCanvasPx || {};
     axisDiffs.x && this.axises.x.zoomFromCanvasPx(axisDiffs.x, centerInCanvasPx.x);
     axisDiffs.y && this.axises.y.zoomFromCanvasPx(axisDiffs.y, centerInCanvasPx.y);
-    this.renderInNextFrame();
+    this.invalidate();
   }
 
   setCanvasViewPort(axisViewPorts:DataValue<Range>){
     axisViewPorts.x && this.axises.x.setCanvasViewPort(axisViewPorts.x);
     axisViewPorts.y && this.axises.y.setCanvasViewPort(axisViewPorts.y);
-    this.renderInNextFrame();
+    this.invalidate();
   }
   setViewPort(axisViewPorts:DataValue<Range>){
     axisViewPorts.x && this.axises.x.setViewPort(axisViewPorts.x);
     axisViewPorts.y && this.axises.y.setViewPort(axisViewPorts.y);
-    this.renderInNextFrame();
+    this.invalidate();
   }
   setViewPortLimit(axisViewPorts:DataValue<Range>){
     axisViewPorts.x && this.axises.x.setViewPortLimit(axisViewPorts.x);
     axisViewPorts.y && this.axises.y.setViewPortLimit(axisViewPorts.y);
-    this.renderInNextFrame();
+    this.invalidate();
   }
 
   d2c(dataInAxisValue:DataPoint):DataPoint{
@@ -130,7 +130,7 @@ export default class CoreChart{
     return this.axises[name];
   }
 
-  renderInNextFrame(){
+  invalidate(){
     if(this.renderId === -1){
       this.renderId = requestAnimationFrame((rafTime)=>{
         const time = performanceNowOrDateNow();
@@ -200,7 +200,7 @@ export default class CoreChart{
   startAnimation(animation:Animation){
     this.animations.push(animation);
     animation.onStart(performanceNowOrDateNow());
-    this.renderInNextFrame();
+    this.invalidate();
   }
   cancelAllAnimation(){
     for(const ani of this.animations){

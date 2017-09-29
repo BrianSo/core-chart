@@ -39,7 +39,7 @@
       });
 
       chart.scroll({x:1}, true, {animated: true});
-      chart.renderInNextFrame();
+      chart.invalidate();
     },1000);
   };
 
@@ -53,7 +53,7 @@
     computed: {},
     watch:{
       shouldRenderPreview(val){
-        this.chart.renderInNextFrame();
+        this.chart.invalidate();
       }
     },
     mounted() {
