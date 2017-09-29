@@ -21,9 +21,6 @@
       let renderer = new BarChartRenderer(this.chart);
       this.chart.on('render', (time, deltaTime)=>renderer.render(time, deltaTime));
 
-      this.chart.setAxis(new Axis('x'));
-      this.chart.setAxis(new YAxis('y'));
-
       this.updateSize();
 
       this.chart.setData([

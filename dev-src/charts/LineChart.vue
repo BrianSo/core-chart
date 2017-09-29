@@ -61,9 +61,6 @@
       let renderer = new LineChartRenderer(this.chart);
       this.chart.on('render', (time, deltaTime)=>renderer.render(time, deltaTime, this.shouldRenderPreview));
 
-      this.chart.setAxis(new Axis('x'));
-      this.chart.setAxis(new YAxis('y'));
-
       this.updateSize();
 
       let {data, max} = generateData();

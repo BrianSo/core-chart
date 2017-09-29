@@ -59,12 +59,7 @@ const data = [
   { x:5,   y:1 },
 ];
 
-const xAxis = new Axis('x');
-const yAxis = new YAxis('y'); // as canvas has inversed y axis value, YAxis fixes this
-
 const chart = new CoreChart(canvas);
-chart.setAxis(xAxis);
-chart.setAxis(yAxis);
 
 // set the region that the data should draw to
 chart.setCanvasViewPort({
