@@ -2,9 +2,17 @@
 const viewPortLength = ({min, max})=> max-min;
 
 export class LineChartRenderer{
-  constructor(chart){
-    this.chart = chart;
+
+  constructor(lineChartComponent){
+    this.ctrl = lineChartComponent;
   }
+
+  install(chart){
+    this.chart = chart;
+    this.name = LineChartRenderer;
+    this.chart.on('render', (time, deltaTime)=>this.render(time, deltaTime, this.ctrl.shouldRenderPreview));
+  }
+  uninstall(){}
 
   render(time, deltaTime, shouldRenderPreview) {
     const ctx = this.chart.ctx;
