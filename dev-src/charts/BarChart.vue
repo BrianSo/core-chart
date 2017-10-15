@@ -52,6 +52,7 @@
     beforeDestroy(){
       console.log('beforeDestroy');
       window.removeEventListener('resize', this.onResize);
+      this.chart.dispose();
     },
     methods: {
       updateSize(){

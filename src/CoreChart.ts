@@ -28,6 +28,7 @@ export default class CoreChart{
   ee: EventEmitter;
   lastTime: number|null;
   animations: Animation[];
+  private disposed: boolean = false;
 
 
   constructor(canvas: HTMLCanvasElement) {
@@ -148,6 +149,10 @@ export default class CoreChart{
   }
 
   renderInNextFrame(){
+    if(this.disposed){
+      console.warn('Calling renderInNextFrame after disposing');
+      return;
+    }
     if(this.renderId === -1){
       this.renderId = requestAnimationFrame((rafTime)=>{
         const time = performanceNowOrDateNow();
@@ -163,6 +168,16 @@ export default class CoreChart{
         this.postRender(time, deltaTime);
       });
     }
+  }
+
+  dispose(){
+    this.cancelRender();
+    this.disposed = true;
+  }
+
+  cancelRender(){
+    cancelAnimationFrame(this.renderId);
+    this.renderId = -1;
   }
 
   beforeRender(time:number, deltaTime:number){
