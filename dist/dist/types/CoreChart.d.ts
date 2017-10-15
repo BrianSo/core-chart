@@ -2,6 +2,7 @@ import EventEmitter from 'wolfy87-eventemitter';
 import { Animation } from './Animation';
 import { Axis } from './Axis';
 import { DataPoint, DataValue, Range } from "./util";
+import { CoreChartPlugin } from "./plugins/Plugin";
 export interface ScrollOptions {
     animated?: boolean;
     animationDuration?: number;
@@ -18,7 +19,17 @@ export default class CoreChart {
     ee: EventEmitter;
     lastTime: number | null;
     animations: Animation[];
-    constructor(canvas: HTMLCanvasElement);
+    plugins: {
+        [key: string]: CoreChartPlugin;
+    };
+    private disposed;
+    constructor(canvas: HTMLCanvasElement, axises?: {
+        [key: string]: Axis;
+    });
+    installPlugin(pluginName: string, plugin: CoreChartPlugin): this;
+    installPlugin(plugin: CoreChartPlugin): this;
+    removePlugin(pluginName: string): this;
+    removePlugin(plugin: CoreChartPlugin): this;
     setData(data: DataPoint[]): void;
     scroll(axisDiffs: DataValue<number>, scrollLimit?: boolean, options?: ScrollOptions): void;
     scrollInPx(axisDiffs: DataValue<number>, scrollLimit?: boolean): void;
@@ -34,6 +45,8 @@ export default class CoreChart {
     removeAxis(name: string): void;
     getAllAxises(): Axis[];
     renderInNextFrame(): void;
+    dispose(): void;
+    cancelRender(): void;
     beforeRender(time: number, deltaTime: number): void;
     render(time: number, deltaTime: number): void;
     postRender(time: number, deltaTime: number): void;

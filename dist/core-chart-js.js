@@ -177,39 +177,9 @@ var DurationAnimation = /** @class */ (function (_super) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewPortMove", function() { return viewPortMove; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewPortZoom", function() { return viewPortZoom; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewPortLength", function() { return viewPortLength; });
-var viewPortMove = function (_a, amount) {
-    var min = _a.min, max = _a.max;
-    return ({
-        min: min + amount,
-        max: max + amount
-    });
-};
-var viewPortZoom = function (_a, scale, mid) {
-    var min = _a.min, max = _a.max;
-    //const mid = (max + min)/2;
-    return {
-        min: (min - mid) * scale + mid,
-        max: (max - mid) * scale + mid
-    };
-};
-var viewPortLength = function (_a) {
-    var min = _a.min, max = _a.max;
-    return max - min;
-};
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return Axis; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return YAxis; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__util__ = __webpack_require__(2);
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -433,6 +403,36 @@ var YAxis = /** @class */ (function (_super) {
 
 
 /***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewPortMove", function() { return viewPortMove; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewPortZoom", function() { return viewPortZoom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewPortLength", function() { return viewPortLength; });
+var viewPortMove = function (_a, amount) {
+    var min = _a.min, max = _a.max;
+    return ({
+        min: min + amount,
+        max: max + amount
+    });
+};
+var viewPortZoom = function (_a, scale, mid) {
+    var min = _a.min, max = _a.max;
+    //const mid = (max + min)/2;
+    return {
+        min: (min - mid) * scale + mid,
+        max: (max - mid) * scale + mid
+    };
+};
+var viewPortLength = function (_a) {
+    var min = _a.min, max = _a.max;
+    return max - min;
+};
+
+
+/***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -440,6 +440,8 @@ var YAxis = /** @class */ (function (_super) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_wolfy87_eventemitter__ = __webpack_require__(8);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_wolfy87_eventemitter___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_wolfy87_eventemitter__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Animation__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Axis__ = __webpack_require__(1);
+
 
 
 var performanceNowOrDateNow = function () {
@@ -449,16 +451,51 @@ var performanceNowOrDateNow = function () {
     return Date.now();
 };
 var CoreChart = /** @class */ (function () {
-    function CoreChart(canvas) {
+    function CoreChart(canvas, axises) {
+        this.disposed = false;
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        this.axises = {};
+        this.axises = axises || {
+            x: new __WEBPACK_IMPORTED_MODULE_2__Axis__["a" /* Axis */]('x'),
+            y: new __WEBPACK_IMPORTED_MODULE_2__Axis__["b" /* YAxis */]('y')
+        };
         this.data = [];
         this.renderId = -1;
         this.ee = new __WEBPACK_IMPORTED_MODULE_0_wolfy87_eventemitter___default.a();
         this.lastTime = null;
         this.animations = [];
+        this.plugins = {};
     }
+    CoreChart.prototype.installPlugin = function (pluginOrName, pluginObj) {
+        var pluginName;
+        var plugin;
+        if (typeof pluginOrName === 'string') {
+            pluginName = pluginOrName;
+            plugin = pluginObj;
+        }
+        else {
+            pluginName = pluginOrName.name;
+            plugin = pluginOrName;
+        }
+        this.plugins[pluginName] = plugin;
+        plugin.install(this);
+        return this;
+    };
+    CoreChart.prototype.removePlugin = function (pluginOrName) {
+        var pluginName;
+        if (typeof pluginOrName === 'string') {
+            pluginName = pluginOrName;
+        }
+        else {
+            pluginName = pluginOrName.name;
+        }
+        var plugin = this.plugins[pluginName];
+        if (plugin) {
+            plugin.uninstall();
+            delete this.plugins[pluginName];
+        }
+        return this;
+    };
     CoreChart.prototype.setData = function (data) {
         this.data = data;
         this.renderInNextFrame();
@@ -573,6 +610,10 @@ var CoreChart = /** @class */ (function () {
     };
     CoreChart.prototype.renderInNextFrame = function () {
         var _this = this;
+        if (this.disposed) {
+            console.warn('Calling renderInNextFrame after disposing');
+            return;
+        }
         if (this.renderId === -1) {
             this.renderId = requestAnimationFrame(function (rafTime) {
                 var time = performanceNowOrDateNow();
@@ -586,6 +627,19 @@ var CoreChart = /** @class */ (function () {
                 _this.postRender(time, deltaTime);
             });
         }
+    };
+    CoreChart.prototype.dispose = function () {
+        this.cancelRender();
+        this.disposed = true;
+        for (var key in this.plugins) {
+            var plugin = this.plugins[key];
+            plugin.uninstall();
+        }
+        this.plugins = {};
+    };
+    CoreChart.prototype.cancelRender = function () {
+        cancelAnimationFrame(this.renderId);
+        this.renderId = -1;
     };
     CoreChart.prototype.beforeRender = function (time, deltaTime) {
         this.ee.emit('beforeRender', time, deltaTime);
@@ -3315,8 +3369,8 @@ if (true) {
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__CoreChart__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Axis__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Axis__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__util__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Animation__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__plugins_index__ = __webpack_require__(4);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CoreChart", function() { return __WEBPACK_IMPORTED_MODULE_0__CoreChart__["a"]; });
@@ -3343,16 +3397,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_hammerjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_hammerjs__);
 
 var PinchPanManager = /** @class */ (function () {
-    function PinchPanManager(canvas, chart, options) {
+    function PinchPanManager(options) {
         if (options === void 0) { options = {}; }
-        var _this = this;
-        options = Object.assign({
-            x: 'x',
-            y: 'y',
+        this.name = 'PinchPanManager';
+        this.options = Object.assign({
             drag: 2,
         }, options);
+    }
+    PinchPanManager.prototype.uninstall = function () {
+        this.mc.destroy();
+    };
+    PinchPanManager.prototype.install = function (chart) {
+        var _this = this;
         this.chart = chart;
-        var mc = new __WEBPACK_IMPORTED_MODULE_0_hammerjs__["Manager"](canvas);
+        this.mc = new __WEBPACK_IMPORTED_MODULE_0_hammerjs__["Manager"](chart.canvas);
+        var options = this.options;
+        var mc = this.mc;
         var pinch = new __WEBPACK_IMPORTED_MODULE_0_hammerjs__["Pinch"]();
         var pan = new __WEBPACK_IMPORTED_MODULE_0_hammerjs__["Pan"]();
         pinch.recognizeWith(pan);
@@ -3436,7 +3496,7 @@ var PinchPanManager = /** @class */ (function () {
             lastEvent = undefined;
             lastPointers = undefined;
         });
-    }
+    };
     return PinchPanManager;
 }());
 /* harmony default export */ __webpack_exports__["a"] = (PinchPanManager);

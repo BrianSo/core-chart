@@ -1,6 +1,6 @@
 {
   "name": "core-chart-js",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "A minimal library for building complex, efficient and highly customized chart",
   "keywords": [
     "chart",
