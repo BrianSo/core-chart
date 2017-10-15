@@ -46,9 +46,6 @@
       this.chart = new CoreChart(this.$refs.canvas);
       this.chart.installPlugin(new LineChartRenderer(this));
 
-      this.chart.setAxis(new Axis('x'));
-      this.chart.setAxis(new YAxis('y'));
-
       this.updateSize();
 
       let {data, max} = generateData();

@@ -1,6 +1,6 @@
 import EventEmitter from 'wolfy87-eventemitter';
 import {Animation, DurationAnimation} from './Animation';
-import {Axis} from './Axis';
+import {Axis, YAxis} from './Axis';
 import {DataPoint, DataValue, Range} from "./util";
 import {CoreChartPlugin} from "./plugins/Plugin";
 
@@ -35,10 +35,13 @@ export default class CoreChart{
   private disposed: boolean = false;
 
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, axises?: { [key: string]: Axis }) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
-    this.axises = {};
+    this.axises = axises || {
+      x: new Axis('x'),
+      y: new YAxis('y')
+    };
     this.data = [];
     this.renderId = -1;
     this.ee = new EventEmitter();
