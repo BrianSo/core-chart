@@ -44,8 +44,7 @@
     },
     mounted() {
       this.chart = new CoreChart(this.$refs.canvas);
-      let renderer = new LineChartRenderer(this.chart);
-      this.chart.on('render', (time, deltaTime)=>renderer.render(time, deltaTime, this.shouldRenderPreview));
+      this.chart.installPlugin(new LineChartRenderer(this));
 
       this.chart.setAxis(new Axis('x'));
       this.chart.setAxis(new YAxis('y'));

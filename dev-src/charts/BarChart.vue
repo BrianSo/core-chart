@@ -18,8 +18,7 @@
     computed: {},
     mounted() {
       this.chart = new CoreChart(this.$refs.canvas);
-      let renderer = new BarChartRenderer(this.chart);
-      this.chart.on('render', (time, deltaTime)=>renderer.render(time, deltaTime));
+      this.chart.installPlugin(new BarChartRenderer());
 
       this.chart.setAxis(new Axis('x'));
       this.chart.setAxis(new YAxis('y'));

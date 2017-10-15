@@ -2,9 +2,12 @@
 const viewPortLength = ({min, max})=> max-min;
 
 export class BarChartRenderer{
-  constructor(chart){
+  install(chart){
     this.chart = chart;
+    this.chart.on('render', (time, deltaTime)=>this.render(time, deltaTime));
   }
+  uninstall(){}
+
   render(time, deltaTime){
     const ctx = this.chart.ctx;
 
