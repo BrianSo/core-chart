@@ -27,27 +27,13 @@
     }
     return {data, max};
   };
-  const simulateRealTimeData = (data, chart)=>{
-    let x = data[data.length-1].x;
-    setInterval(()=>{
-      let y = data[data.length - 1].y *  (0.8 + Math.random() * 0.41);
-
-      data.shift();
-      data.push({
-        x:x++,
-        y:y
-      });
-
-      chart.scroll({x:1}, true, {animated: true});
-      chart.renderInNextFrame();
-    },1000);
-  };
 
   export default {
     data() {
       return {
         chart: null,
         shouldRenderPreview: false,
+        intervalId: -1,
       }
     },
     computed: {},
@@ -69,7 +55,7 @@
       let {data, max} = generateData();
 
       // simulate receiving real time data and scroll the chart
-      simulateRealTimeData(data, this.chart);
+      this.simulateRealTimeData(data, this.chart);
 
       this.chart.setData(data);
 
@@ -100,11 +86,12 @@
       });
       window.addEventListener('resize', this.onResize, false);
 
-      new PinchPanManager(this.$refs.canvas, this.chart);
+      this.chart.installPlugin(new PinchPanManager());
     },
     beforeDestroy(){
       window.removeEventListener('resize', this.onResize);
       this.chart.dispose();
+      clearInterval(this.intervalId);
     },
     methods: {
       updateSize(){
@@ -120,7 +107,22 @@
       onResize(){
         this.updateSize();
         this.chart.render();
-      }
+      },
+      simulateRealTimeData(data, chart){
+        let x = data[data.length-1].x;
+        this.intervalId = setInterval(()=>{
+          let y = data[data.length - 1].y *  (0.8 + Math.random() * 0.41);
+
+          data.shift();
+          data.push({
+            x:x++,
+            y:y
+          });
+
+          chart.scroll({x:1}, true, {animated: true});
+          chart.renderInNextFrame();
+        },1000);
+      },
     },
     props: {},
     components: {}

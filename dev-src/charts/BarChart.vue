@@ -47,7 +47,7 @@
       // Events
       window.addEventListener('resize', this.onResize, false);
 
-      new PinchPanManager(this.$refs.canvas, this.chart);
+      this.chart.installPlugin(new PinchPanManager());
     },
     beforeDestroy(){
       console.log('beforeDestroy');

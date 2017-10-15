@@ -2,6 +2,7 @@ import EventEmitter from 'wolfy87-eventemitter';
 import {Animation, DurationAnimation} from './Animation';
 import {Axis} from './Axis';
 import {DataPoint, DataValue, Range} from "./util";
+import {CoreChartPlugin} from "./plugins/Plugin";
 
 const performanceNowOrDateNow = ()=>{
   if(window.performance && window.performance.now){
@@ -28,6 +29,9 @@ export default class CoreChart{
   ee: EventEmitter;
   lastTime: number|null;
   animations: Animation[];
+  plugins: {
+    [key: string]: CoreChartPlugin
+  };
   private disposed: boolean = false;
 
 
@@ -40,6 +44,43 @@ export default class CoreChart{
     this.ee = new EventEmitter();
     this.lastTime = null;
     this.animations = [];
+    this.plugins = {};
+  }
+
+  installPlugin(pluginName: string, plugin: CoreChartPlugin): this;
+  installPlugin(plugin: CoreChartPlugin): this;
+  installPlugin(pluginOrName: CoreChartPlugin | string, pluginObj?: CoreChartPlugin): this{
+    let pluginName : string;
+    let plugin: CoreChartPlugin;
+    if(typeof pluginOrName === 'string'){
+      pluginName = pluginOrName;
+      plugin = pluginObj!;
+    }else{
+      pluginName = pluginOrName.name;
+      plugin = pluginOrName;
+    }
+
+    this.plugins[pluginName] = plugin;
+    plugin.install(this);
+    return this;
+  }
+
+  removePlugin(pluginName: string): this;
+  removePlugin(plugin: CoreChartPlugin): this;
+  removePlugin(pluginOrName: CoreChartPlugin | string): this{
+    let pluginName : string;
+    if(typeof pluginOrName === 'string'){
+      pluginName = pluginOrName;
+    }else{
+      pluginName = pluginOrName.name;
+    }
+
+    let plugin = this.plugins[pluginName];
+    if (plugin){
+      plugin.uninstall();
+      delete this.plugins[pluginName];
+    }
+    return this;
   }
 
   setData(data:DataPoint[]){
@@ -173,6 +214,12 @@ export default class CoreChart{
   dispose(){
     this.cancelRender();
     this.disposed = true;
+
+    for(let key in this.plugins){
+      let plugin = this.plugins[key];
+      plugin.uninstall();
+    }
+    this.plugins = {};
   }
 
   cancelRender(){

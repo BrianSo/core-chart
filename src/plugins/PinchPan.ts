@@ -1,4 +1,5 @@
 import * as Hammer from 'hammerjs';
+import {CoreChartPlugin} from './Plugin';
 import CoreChart from "../CoreChart";
 
 export interface PinchPanManagerOptions{
@@ -7,20 +8,29 @@ export interface PinchPanManagerOptions{
   drag?: number
 }
 
-export default class PinchPanManager{
+export default class PinchPanManager implements CoreChartPlugin{
 
+  name = 'PinchPanManager';
   chart: CoreChart;
+  options: PinchPanManagerOptions;
+  mc: HammerManager;
 
-  constructor(canvas: HTMLCanvasElement, chart: CoreChart, options: PinchPanManagerOptions = {}){
-    options = Object.assign({
-      x: 'x',
-      y: 'y',
+  constructor(options: PinchPanManagerOptions = {}){
+    this.options = Object.assign({
       drag: 2,
     },options);
+  }
 
+  uninstall(){
+    this.mc.destroy();
+  }
+
+  install(chart: CoreChart){
     this.chart = chart;
-    const mc = new Hammer.Manager(canvas);
+    this.mc = new Hammer.Manager(chart.canvas);
 
+    const options = this.options;
+    const mc = this.mc;
     const pinch = new Hammer.Pinch();
     const pan = new Hammer.Pan();
 
